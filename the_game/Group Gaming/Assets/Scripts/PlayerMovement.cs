@@ -23,12 +23,14 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        horizontalInput = Input.GetAxis("Horizontal");
         if (Input.GetKeyDown("space")){
             player.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
+        
 
 
+        // movement.x = horizontalInput;
         movement.x = horizontalInput * moveSpeed;
 
         if (horizontalInput > 0){
@@ -37,10 +39,16 @@ public class PlayerMovement : MonoBehaviour
         else if (horizontalInput < 0){
             transform.localScale = new Vector3(1, 1, 1);
         }
+
+        animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
+        animator.SetFloat("FallingSpeed", player.velocity.y);
+        animator.SetBool("IsAttacking", Input.GetKey("e"));
+        animator.SetBool("IsSitting", Input.GetKey("left shift"));
     }
 
     void FixedUpdate()
     {
         player.position += movement * Time.fixedDeltaTime;
+        // player.AddForce(movement * moveSpeed);
     }
 }
