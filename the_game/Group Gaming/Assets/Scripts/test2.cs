@@ -23,6 +23,9 @@ public class test2 : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        if (backgroundThread != null) { 
+        backgroundThread.Abort();
+        }
         generator.ResetMap();
     }
 
@@ -52,14 +55,14 @@ public class test2 : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (backgroundThread.IsAlive)
+        if (backgroundThread == null || backgroundThread.IsAlive)
         {
             return;
         }
         foreach(KeyValuePair<Generator.Coord, int> tile in generator.map)
         {
             Gizmos.color = (tile.Value == 1) ? Color.black : Color.white;
-            Vector3 pos = new Vector3(-width / 2 + tile.Key.tileX + .5f, -height / 2 + tile.Key.tileY + .5f, 0);
+            Vector3 pos = new Vector3(tile.Key.tileX, tile.Key.tileY, 0);
             Gizmos.DrawCube(pos, Vector3.one);
         }
     }

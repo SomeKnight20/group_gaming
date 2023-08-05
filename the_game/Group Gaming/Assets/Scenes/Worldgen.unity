@@ -449,8 +449,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   generator: {fileID: 11400000, guid: d43ee555c2b608643bc9f5b1e02f873f, type: 2}
-  width: 80
-  height: 140
+  width: 200
+  height: 300
 --- !u!1 &1660953772
 GameObject:
   m_ObjectHideFlags: 0

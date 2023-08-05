@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215085e80051f5d4b875f633ec962df0, type: 3}
   m_Name: Noise1
   m_EditorClassIdentifier: 
-  seed: 50
+  seed: 2434
   frequenzy: 0.84
   scale: 0.96
   threshold: 0.458
