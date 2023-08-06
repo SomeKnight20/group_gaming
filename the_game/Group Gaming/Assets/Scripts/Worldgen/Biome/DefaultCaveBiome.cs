@@ -20,7 +20,7 @@ public class DefaultCaveBiome : Biome
 
             if (tileType == TileType.SOLID)
             {
-                tilemapData.Add(coord, stone);
+                this.tilemapData.Add(coord, stone);
             }
         }
     }

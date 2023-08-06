@@ -6,9 +6,14 @@ using UnityEngine;
 public class TileAtlas : ScriptableObject
 {
     public List<TileAtlasTile> tiles = new List<TileAtlasTile>();
-    public Dictionary<int, TileAtlasTile> mappedTiles; // ID, Tile
+    public Dictionary<int, TileAtlasTile> mappedTiles = new Dictionary<int, TileAtlasTile>(); // ID, Tile
 
     private void Awake()
+    {
+        MapTiles();
+    }
+
+    void MapTiles()
     {
         mappedTiles = new Dictionary<int, TileAtlasTile>();
 
@@ -17,5 +22,14 @@ public class TileAtlas : ScriptableObject
         {
             mappedTiles[tile.tileID] = tile;
         }
+    }
+
+    public TileAtlasTile GetTileWithID(int id)
+    {
+        if (!mappedTiles.ContainsKey(id))
+        {
+            MapTiles();
+        }
+        return mappedTiles[id];
     }
 }

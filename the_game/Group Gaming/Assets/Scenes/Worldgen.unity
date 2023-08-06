@@ -481,7 +481,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 701714366}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d72de94b699023145b6032346b891858, type: 3}
   m_Name: 
@@ -505,11 +505,12 @@ MonoBehaviour:
   biomes:
   - {fileID: 11400000, guid: b8b00644c98bad54fba68632d113780e, type: 2}
   - {fileID: 11400000, guid: 3069d3938a9114148880f1bb630ab6f2, type: 2}
-  - {fileID: 11400000, guid: 054b8c70b1dc83c41b755e2915295a8b, type: 2}
-  allBiomesWeight: 0
+  - {fileID: 11400000, guid: 59691ac54f186f442b47d487d33e513c, type: 2}
+  biomeNoisePixelSize: 50
   biomeNoise: {fileID: 11400000, guid: 4770b72a0b7c2ad43a91cd2e3fca8286, type: 2}
-  width: 200
-  height: 200
+  generateBiomesX: 4
+  generateBiomesY: 4
+  tilemap: {fileID: 485069018}
 --- !u!1 &1660953772
 GameObject:
   m_ObjectHideFlags: 0

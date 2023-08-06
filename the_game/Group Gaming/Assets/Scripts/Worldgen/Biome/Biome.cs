@@ -17,7 +17,7 @@ public class Biome : ScriptableObject
     public TileAtlas tileAtlas;
     protected Tilemap tilemap;
 
-    protected Dictionary<Generator.Coord, TileAtlasTile> tilemapData;
+    protected Dictionary<Generator.Coord, TileAtlasTile> tilemapData = new Dictionary<Generator.Coord, TileAtlasTile>();
 
     public virtual void SetDefaultTilemap(Tilemap tilemap)
     {
@@ -56,12 +56,14 @@ public class Biome : ScriptableObject
             return;
         }
 
-        foreach(KeyValuePair<Generator.Coord, TileAtlasTile> tile in tilemapData)
+        foreach(KeyValuePair<Generator.Coord, TileAtlasTile> tile in this.tilemapData)
         {
             Generator.Coord coord = tile.Key;
             TileAtlasTile tileData = tile.Value;
             tilemap.SetTile(new Vector3Int(coord.tileX, coord.tileY, 0), tileData.tile);
         }
+
+        generator.ResetMap();
     }
 
     public Generator GetGenerator() { return generator; }
