@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 485069016}
   - component: {fileID: 485069018}
   - component: {fileID: 485069017}
+  - component: {fileID: 485069019}
   m_Layer: 0
   m_Name: Tilemap
   m_TagString: Untagged
@@ -267,6 +268,42 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!19719996 &485069019
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485069015}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_MaximumTileChangeCount: 0
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &499865705
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,6 +451,7 @@ GameObject:
   m_Component:
   - component: {fileID: 701714367}
   - component: {fileID: 701714369}
+  - component: {fileID: 701714370}
   m_Layer: 0
   m_Name: WorldgenObj
   m_TagString: Untagged
@@ -448,9 +486,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d72de94b699023145b6032346b891858, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generator: {fileID: 11400000, guid: d43ee555c2b608643bc9f5b1e02f873f, type: 2}
+  biome: {fileID: 11400000, guid: 3069d3938a9114148880f1bb630ab6f2, type: 2}
+  width: 100
+  height: 100
+  tilemap: {fileID: 485069018}
+--- !u!114 &701714370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 701714366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f773633b48c76ef44a64d408d7a4ce35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  biomes:
+  - {fileID: 11400000, guid: b8b00644c98bad54fba68632d113780e, type: 2}
+  - {fileID: 11400000, guid: 3069d3938a9114148880f1bb630ab6f2, type: 2}
+  - {fileID: 11400000, guid: 054b8c70b1dc83c41b755e2915295a8b, type: 2}
+  allBiomesWeight: 0
+  biomeNoise: {fileID: 11400000, guid: 4770b72a0b7c2ad43a91cd2e3fca8286, type: 2}
   width: 200
-  height: 300
+  height: 200
 --- !u!1 &1660953772
 GameObject:
   m_ObjectHideFlags: 0

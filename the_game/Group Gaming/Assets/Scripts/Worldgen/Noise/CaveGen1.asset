@@ -16,3 +16,5 @@ MonoBehaviour:
   smoothingIterationCount: 4
   adjancedTileCountOffset: 0
   minCaveRoomSize: 50
+  caveRoomConnectionIterations: 1
+  caveRoomConnectionRadius: 2

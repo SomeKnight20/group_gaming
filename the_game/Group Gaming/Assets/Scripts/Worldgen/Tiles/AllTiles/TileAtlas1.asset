@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 215085e80051f5d4b875f633ec962df0, type: 3}
-  m_Name: Noise1
+  m_Script: {fileID: 11500000, guid: adf8c23ac37ff194a881758360a86253, type: 3}
+  m_Name: TileAtlas1
   m_EditorClassIdentifier: 
-  seed: 2434
-  frequenzy: 0.41
-  scale: 0.96
-  threshold: 0.448
+  tiles:
+  - {fileID: 11400000, guid: b2ac4aa68d941984aa529e4bd6f312e7, type: 2}
+  - {fileID: 11400000, guid: 85c30e7079a9a664cac4a7b1a49a62f1, type: 2}

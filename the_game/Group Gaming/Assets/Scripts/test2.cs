@@ -8,25 +8,28 @@ using UnityEngine.Tilemaps;
 
 public class test2 : MonoBehaviour
 {
-    public Generator generator;
+    public Biome biome;
 
     public int width = 100;
     public int height = 300;
 
     Thread backgroundThread = null;
 
+    public Tilemap tilemap;
+
     // Start is called before the first frame update
     void Start()
     {
         GenerateWorld();
+        biome.SetDefaultTilemap(tilemap);
     }
 
     private void OnApplicationQuit()
     {
-        if (backgroundThread != null) { 
-        backgroundThread.Abort();
+        if (backgroundThread != null) {
+            backgroundThread.Abort();
         }
-        generator.ResetMap();
+        biome.GetGenerator().ResetMap();
     }
 
     // Update is called once per frame
@@ -39,18 +42,19 @@ public class test2 : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            backgroundThread = new Thread(() => { generator.CreateMapFromArea(width, 0, 100, 100); });
-            backgroundThread.Start();
+            biome.CreateMapFromArea(width, 0, 100, 100);
+            biome.ProcessMap(width, 0, 100, 100);
+            biome.FillTilemap(width, 0, 100, 100);
         }
     }
 
     void GenerateWorld()
     {
-        generator.ResetMap();
+        biome.ResetMap();
 
-        // Start a new thread
-        backgroundThread = new Thread(() =>  { generator.CreateMapFromArea(0, 0, width, height); });
-        backgroundThread.Start();
+        biome.CreateMapFromArea(0, 0, width, height);
+        biome.ProcessMap(0, 0, width, height);
+        biome.FillTilemap(width, 0, 100, 100);
     }
 
     private void OnDrawGizmos()
@@ -59,9 +63,9 @@ public class test2 : MonoBehaviour
         {
             return;
         }
-        foreach(KeyValuePair<Generator.Coord, int> tile in generator.map)
+        foreach(KeyValuePair<Generator.Coord, TileType> tile in biome.GetGenerator().map)
         {
-            Gizmos.color = (tile.Value == 1) ? Color.black : Color.white;
+            Gizmos.color = (tile.Value == TileType.SOLID) ? Color.black : Color.white;
             Vector3 pos = new Vector3(tile.Key.tileX, tile.Key.tileY, 0);
             Gizmos.DrawCube(pos, Vector3.one);
         }

@@ -22,4 +22,10 @@ public class Noise : ScriptableObject
         float noiseValue = Mathf.PerlinNoise(x / frequenzy + seed, y / frequenzy + seed) * scale;
         return (noiseValue < threshold) ? 1 : 0;
     }
+
+    public virtual float GetPureNoiseAt(int x, int y)
+    {
+        float noiseValue = Mathf.PerlinNoise(x / frequenzy + seed, y / frequenzy + seed) * scale;
+        return noiseValue;
+    }
 }

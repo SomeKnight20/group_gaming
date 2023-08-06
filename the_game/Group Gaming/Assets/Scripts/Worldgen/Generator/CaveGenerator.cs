@@ -24,6 +24,8 @@ public class CaveGenerator : Generator
     [Tooltip("How wide tunnels are created between caves")]
     public int caveRoomConnectionRadius = 3;
 
+    protected List<Thread> caveLineThreads = new List<Thread>();
+
     public override void CreateMapFromArea(int startX, int startY, int width, int height)
     {
         base.CreateMapFromArea(startX, startY, width, height);
@@ -46,15 +48,21 @@ public class CaveGenerator : Generator
                 ConnectClosestCaveRooms(caveRooms);
             }
             ConnectCaveRoomsToMainRoom(caveRooms);
+
+            for (int i = 0; i < caveLineThreads.Count; i++)
+            {
+                caveLineThreads[i].Join();
+            }
+            caveLineThreads = new List<Thread>();
         }
     }
 
-    public void SetTileAt(int x, int y, int type)
+    public void SetTileAt(int x, int y, TileType type)
     {
         Coord coord = new Coord(x, y);
-        map[coord] = type;
+        SetTileAt(coord, type);
     }
-    public void SetTileAt(Coord coord, int type)
+    public void SetTileAt(Coord coord, TileType type)
     {
         map[coord] = type;
     }
@@ -72,11 +80,11 @@ public class CaveGenerator : Generator
                 // Determine if tile should be air or solid
                 if (neighbourWallTiles > 4 + adjancedTileCountOffset)
                 {
-                    map[coord] = 1;
+                    map[coord] = TileType.SOLID;
                 }
                 else if (neighbourWallTiles < 4 - adjancedTileCountOffset)
                 {
-                    map[coord] = 0;
+                    map[coord] = TileType.AIR;
                 }
 
             }
@@ -203,6 +211,8 @@ public class CaveGenerator : Generator
         });
 
         thread.Start();
+
+        caveLineThreads.Add(thread);
     }
 
 
@@ -392,6 +402,7 @@ public class CaveGenerator : Generator
                 {
                     for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++)
                     {
+                        // If tile is not a diagnonal tile
                         if (x == tile.tileX || y == tile.tileY)
                         {
                             // If position is solid
@@ -476,7 +487,7 @@ public class CaveGenerator : Generator
         {
             foreach(Coord tile in tiles)
             {
-                caveGenerator.SetTileAt(tile, 1);
+                caveGenerator.SetTileAt(tile, TileType.SOLID);
             }
         }
 
