@@ -28038,10 +28038,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3089148822206016117, guid: ad04c52196f571447a0aff2340ce89fb, type: 3}
-      propertyPath: m_Size.x
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 5989245069939538596, guid: ad04c52196f571447a0aff2340ce89fb, type: 3}
       propertyPath: m_Name
       value: Player
@@ -28156,18 +28152,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1732589285639931394, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_BackGroundColor.b
-      value: 0.33962262
-      objectReference: {fileID: 0}
-    - target: {fileID: 1732589285639931394, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_BackGroundColor.g
-      value: 0.33962262
-      objectReference: {fileID: 0}
-    - target: {fileID: 1732589285639931394, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_BackGroundColor.r
-      value: 0.33962262
-      objectReference: {fileID: 0}
     - target: {fileID: 1829311273888839159, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
       propertyPath: m_Name
       value: Main Camera
@@ -28216,10 +28200,6 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 1452071998}
-    - target: {fileID: 8042736649856632602, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: lerpSpeed
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
