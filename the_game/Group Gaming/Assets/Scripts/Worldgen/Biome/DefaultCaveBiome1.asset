@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b027a7f45dff54cbf6d13c8e2706e0, type: 3}
+  m_Name: DefaultCaveBiome1
+  m_EditorClassIdentifier: 
+  generator: {fileID: 11400000, guid: d43ee555c2b608643bc9f5b1e02f873f, type: 2}
+  spawnWeight: 1
+  tileAtlas: {fileID: 11400000, guid: e7ded2ce7c405da439dda4686f1dc4ba, type: 2}
+  stone: {fileID: 11400000, guid: b2ac4aa68d941984aa529e4bd6f312e7, type: 2}
