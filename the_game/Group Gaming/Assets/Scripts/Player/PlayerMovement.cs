@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
 {
     public Animator animator;
     private Rigidbody2D player;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private LayerMask groundLayer;
 
     float horizontalInput;
     float verticalInput;
@@ -13,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
+
+    public bool isFlying = false;
 
     // Start is called before the first frame update
     void Start()
@@ -24,9 +28,13 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         horizontalInput = Input.GetAxis("Horizontal");
-        if (Input.GetKeyDown("space")){
+        if (Input.GetKeyDown("space") && IsGrounded()){
             player.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
+        if (Input.GetKeyUp("space") && player.velocity.y > 0f){
+            player.velocity = new Vector2(movement.x, player.velocity.y * 0.5f);
+        }
+        
         
 
 
@@ -48,7 +56,15 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        player.position += movement * Time.fixedDeltaTime;
-        // player.AddForce(movement * moveSpeed);
+        // player.position += movement * Time.fixedDeltaTime;
+        player.velocity = new Vector2(movement.x, player.velocity.y);
+    }
+
+    private bool IsGrounded()
+    {
+        if(isFlying){
+            return true;
+        }
+        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
     }
 }
