@@ -31,6 +31,8 @@ public class InventoryManager : MonoBehaviour
 
     public PlayerInventoryController playerController;
 
+    public ItemHolderScript itemHolderScript;
+
     bool isMovingItem;
 
     private void Start(){
@@ -56,7 +58,7 @@ public class InventoryManager : MonoBehaviour
         for (int i = 0; i < slotHolder.transform.childCount; i++){
             slots[i] = slotHolder.transform.GetChild(i).gameObject;
         }
-        Add(itemToAdd, 1);
+        Add(itemHolderScript.itemiData, 1);
         Remove(itemToRemove);
         RefreshUI();
     }
