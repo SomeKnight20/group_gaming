@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimer -= Time.deltaTime;
         }
         if (IsGrounded() || isGrabbingLedge || coyoteTimer >= 0){
-            if(Input.GetKeyDown("space") || (jumpBufferTimer >= 0 && IsGrounded())){
+            if(Input.GetKeyDown("space") || jumpBufferTimer >= 0){
                 coyoteTimer = 0;
                 jumpBufferTimer = 0;
                 // player.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
