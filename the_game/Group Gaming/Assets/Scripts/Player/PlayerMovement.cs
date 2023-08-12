@@ -27,7 +27,6 @@ public class PlayerMovement : MonoBehaviour
 
     public float coyoteTime = 5f;
     private float coyoteTimer = 0f;
-
     public float jumpBufferTime = 1f;
     private float jumpBufferTimer = 0f;
 
@@ -55,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
             jumpBufferTimer -= Time.deltaTime;
         }
 
-        if (IsGrounded() && !Input.GetKey("space")){
+        if ((IsGrounded() || isGrabbingLedge) && !Input.GetKey("space")){
             coyoteTimer = coyoteTime;
         }else if(coyoteTimer >= 0){
             coyoteTimer -= Time.deltaTime;
@@ -124,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
 
         animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
         animator.SetFloat("FallingSpeed", player.velocity.y);
-        animator.SetBool("IsAttacking", Input.GetKey("e"));
+        // animator.SetBool("IsAttacking", Input.GetKey("e"));
 
         
     }
