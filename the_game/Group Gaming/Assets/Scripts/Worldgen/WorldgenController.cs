@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Properties;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.XR;
@@ -12,10 +13,13 @@ public class WorldgenController : MonoBehaviour
     public List<Biome> biomes = new List<Biome>();
     public Dictionary<Biome, float> biomeSpawnChances = new Dictionary<Biome, float>();
     Dictionary<Generator.Coord, Biome> biomeMap = new Dictionary<Generator.Coord, Biome>();
+    HashSet<Generator.Coord> generatedBiomes = new HashSet<Generator.Coord>();
+    protected Dictionary<Generator.Coord, TileAtlasTile> allTilemapData = new Dictionary<Generator.Coord, TileAtlasTile>(); // Contains all generated tiles
 
     float allBiomesWeight = 0; // All biome weights added together
     [Tooltip("How big 1 pixel is on the biome noise map")]
-    public int biomeNoisePixelSize = 50;
+    public int biomeNoisePixelSizeWidth = 50;
+    public int biomeNoisePixelSizeHeight = 50;
 
     public Noise biomeNoise;
     public int generateBiomesX = 4;
@@ -30,10 +34,11 @@ public class WorldgenController : MonoBehaviour
         foreach (Biome biome in biomes)
         {
             biome.SetDefaultTilemap(tilemap);
+            biome.SetWorldGenerator(this);
         }
 
         RecalculateBiomeChances();
-        GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSize, generateBiomesY * biomeNoisePixelSize);
+        GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSizeWidth, generateBiomesY * biomeNoisePixelSizeHeight);
         GenerateWorld(0, 0, generateBiomesX, generateBiomesY);
     }
 
@@ -65,7 +70,7 @@ public class WorldgenController : MonoBehaviour
 
     public Generator.Coord PositionToBiomePos(int x, int y)
     {
-        return new Generator.Coord(Mathf.FloorToInt(x / biomeNoisePixelSize), Mathf.FloorToInt(y / biomeNoisePixelSize));
+        return new Generator.Coord(Mathf.FloorToInt(x / biomeNoisePixelSizeWidth), Mathf.FloorToInt(y / biomeNoisePixelSizeHeight));
     }
 
     float BiomeNoiseAt(int x, int y)
@@ -74,7 +79,7 @@ public class WorldgenController : MonoBehaviour
         return noiseValue;
     }
 
-    Biome BiomeAt(int x, int y)
+    public Biome BiomeAt(int x, int y)
     {
         Generator.Coord biomePos = PositionToBiomePos(x, y);
         return biomeMap[biomePos];
@@ -105,7 +110,18 @@ public class WorldgenController : MonoBehaviour
             }
         }
     }
-
+    void AddBiomeAt(int biomeX, int biomeY)
+    {
+        this.generatedBiomes.Add(new Generator.Coord(biomeX, biomeY));
+    }
+    public bool IsBiomeGeneratedAt(int biomeX, int biomeY)
+    {
+        return this.generatedBiomes.Contains(new Generator.Coord(biomeX, biomeY));
+    }
+    public Dictionary<Generator.Coord, TileAtlasTile> GetAllTilemapData()
+    {
+        return this.allTilemapData;
+    }
     void GenerateWorld(int biomeX, int biomeY, int amountX, int amountY)
     {
         for (int x = biomeX; x < amountX + biomeX; x++)
@@ -113,23 +129,44 @@ public class WorldgenController : MonoBehaviour
             for (int y = biomeY; y < amountY + biomeY; y++)
             {
                 Biome biome = BiomeAtBiomeCoords(x, y);
-                biome.CreateMapFromArea(x * biomeNoisePixelSize, y * biomeNoisePixelSize, biomeNoisePixelSize, biomeNoisePixelSize);
-                biome.ProcessMap(x * biomeNoisePixelSize, y * biomeNoisePixelSize, biomeNoisePixelSize, biomeNoisePixelSize);
-                biome.FillTilemap(x * biomeNoisePixelSize, y * biomeNoisePixelSize, biomeNoisePixelSize, biomeNoisePixelSize);
+                biome.CreateMapFromArea(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
+                biome.ConnectToClosestBiome(x, y);
+                biome.ProcessMap(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
+                biome.FillTilemap(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
+                Dictionary<Generator.Coord, TileAtlasTile> copyOfBiomeTiles = new Dictionary<Generator.Coord, TileAtlasTile>(biome.GetTilemapData());
+                
+                foreach(KeyValuePair<Generator.Coord, TileAtlasTile> kvp in copyOfBiomeTiles)
+                {
+                    allTilemapData.Add(kvp.Key, kvp.Value);
+                }
+
+                AddBiomeAt(x, y);
             } 
         }
+    }
+
+    void ResetMap()
+    {
+        this.generatedBiomes = new HashSet<Generator.Coord> ();
+        this.allTilemapData = new Dictionary<Generator.Coord, TileAtlasTile>();
+    }
+
+    public bool TileExistsAt(int x, int y)
+    {
+        return this.allTilemapData.ContainsKey(new Generator.Coord(x, y));
     }
 
     private void Update()
     {
         if(Input.GetMouseButtonDown(0))
         {
+            ResetMap();
             foreach (Biome biome in biomes)
             {
                 biome.ResetMap();
             }
             RecalculateBiomeChances();
-            GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSize, generateBiomesY * biomeNoisePixelSize);
+            GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSizeWidth, generateBiomesY * biomeNoisePixelSizeHeight);
             GenerateWorld(0, 0, generateBiomesX, generateBiomesY);
         }
         if (Input.GetMouseButtonDown(2))
