@@ -33,6 +33,9 @@ public class InventoryManager : MonoBehaviour
 
     public ItemHolderScript itemHolderScript;
 
+    public GameObject ItemHolder;
+    public GameObject PlayerCharacter;
+
     bool isMovingItem;
 
     private void Start(){
@@ -250,9 +253,15 @@ public class InventoryManager : MonoBehaviour
         originalSlot = GetClosestSlot();
 
         if (originalSlot == null) {
-            Add(movingSlot.GetItem(), movingSlot.GetQuantity());
-            movingSlot.Clear();
+            // Add(movingSlot.GetItem(), movingSlot.GetQuantity());
+            // movingSlot.Clear();
+            // Debug.Log("tyhja");
 
+            GameObject InstantiatedItemHolder = Instantiate(ItemHolder, PlayerCharacter.transform.position, PlayerCharacter.transform.rotation);
+			InstantiatedItemHolder.gameObject.GetComponent<ItemHolderScript>().itemiData = movingSlot.GetItem();
+            InstantiatedItemHolder.gameObject.GetComponent<ItemHolderScript>().itemiAmount = movingSlot.GetQuantity();
+            
+            movingSlot.Clear();
         }
         else {
 
