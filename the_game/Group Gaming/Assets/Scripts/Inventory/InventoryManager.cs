@@ -77,14 +77,66 @@ public class InventoryManager : MonoBehaviour
             //find the closest slot (the slot we clicked on)
             if (isMovingItem) {
                 EndItemMove();
+                
             }
                 //end item move
             else BeginItemMove();
 
-            primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
-            secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
-            consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
-            armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+            // primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
+            // secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+            // consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+            // armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+
+            if(items[slots.Length - hotbarSlots.Length].GetItem() != null){
+                if (items[slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "primary")
+                {
+                    ItemClass tempAddedItem = items[slots.Length - hotbarSlots.Length].GetItem();
+                    int tempAddedAmount = items[slots.Length - hotbarSlots.Length].GetQuantity();
+                    items[slots.Length - hotbarSlots.Length].Clear();
+                    Add(tempAddedItem, tempAddedAmount);
+                } else primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
+            }
+
+            if(items[1 + slots.Length - hotbarSlots.Length].GetItem() != null){
+                if (items[1 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "secondary")
+                {
+                    ItemClass tempAddedItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+                    int tempAddedAmount = items[1 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    items[1 + slots.Length - hotbarSlots.Length].Clear();
+                    Add(tempAddedItem, tempAddedAmount);
+                } else secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+            }
+
+            if(items[2 + slots.Length - hotbarSlots.Length].GetItem() != null){
+                if (items[2 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "consumable")
+                {
+                    ItemClass tempAddedItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+                    int tempAddedAmount = items[2 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    items[2 + slots.Length - hotbarSlots.Length].Clear();
+                    Add(tempAddedItem, tempAddedAmount);
+                } else consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+            }
+
+            if(items[3 + slots.Length - hotbarSlots.Length].GetItem() != null){
+                if (items[3 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "armor")
+                {
+                    ItemClass tempAddedItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+                    int tempAddedAmount = items[3 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    items[3 + slots.Length - hotbarSlots.Length].Clear();
+                    Add(tempAddedItem, tempAddedAmount);
+                } else armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+            }
+
+            if(items[4 + slots.Length - hotbarSlots.Length].GetItem() != null){
+                if (items[4 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "accessory")
+                {
+                    ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    Add(tempAddedItem, tempAddedAmount);
+                } else armorItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+            }
+
 
         } else if (Input.GetMouseButtonDown(1)){ //right clicked
             //find the closest slot (the slot we clicked on)
@@ -97,7 +149,7 @@ public class InventoryManager : MonoBehaviour
             }
         } 
 
-
+        // Debug.Log(items[slots.Length - hotbarSlots.Length].GetItem().itemSlotType);
         // //VAIHA PRIMARY ITEMIKS JA JOKASELLE ITEMILLE OMA SLOTTI
         // //OPTIMOI JOS MAHOLLISTA
         // primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
@@ -158,7 +210,7 @@ public class InventoryManager : MonoBehaviour
             slot.AddQuantity(quantity);
         } 
         else{
-            for (int i = 0; i < items.Length; i++){
+            for (int i = 0; i < items.Length - 5; i++){
                 if (items[i].GetItem() == null) // this is an empty slot
                 {
                     items[i].AddItem(item, quantity);

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Sword
   m_EditorClassIdentifier: 
   itemName: Miekka
+  itemSlotType: primary
   itemIcon: {fileID: 0}
   isStackable: 0
   toolType: 0

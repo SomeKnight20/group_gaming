@@ -21,6 +21,9 @@ public class ItemClass : ScriptableObject
     //Dataa (jaettu) kaikille itemityypeille
     [Header("Tool")]
     public string itemName;
+
+    public string itemSlotType;
+
     public Sprite itemIcon;
     public bool isStackable = true;
 
