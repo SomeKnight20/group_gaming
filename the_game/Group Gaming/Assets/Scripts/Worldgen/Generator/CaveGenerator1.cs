@@ -24,7 +24,9 @@ public class CaveGenerator1 : Generator
     [Tooltip("How many times each cave connects to some other cave. NOTE: This is very performance heavy.")]
     public int caveRoomConnectionIterations = 1;
     [Tooltip("How wide tunnels are created between caves")]
-    public int caveRoomConnectionRadius = 3;
+    public int caveRoomConnectionRadiusMin = 3;
+    public int caveRoomConnectionRadiusMax = 3;
+
     [Tooltip("How long the connections can be between cave areas")]
     public int maxConnectionDistance = 999999;
 
@@ -216,6 +218,8 @@ public class CaveGenerator1 : Generator
             List<Coord> line = GetLine(tileA, tileB);
             foreach (Coord c in line)
             {
+                System.Random rnd = new System.Random();
+                int caveRoomConnectionRadius = rnd.Next(caveRoomConnectionRadiusMin, caveRoomConnectionRadiusMax);
                 DrawCircle(c, caveRoomConnectionRadius);
             }
         });

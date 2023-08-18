@@ -507,7 +507,7 @@ MonoBehaviour:
   biomeNoisePixelSizeWidth: 100
   biomeNoisePixelSizeHeight: 30
   biomeNoise: {fileID: 11400000, guid: 4770b72a0b7c2ad43a91cd2e3fca8286, type: 2}
-  generateBiomesX: 1
+  generateBiomesX: 2
   generateBiomesY: 2
   tilemap: {fileID: 485069018}
 --- !u!1 &1660953772

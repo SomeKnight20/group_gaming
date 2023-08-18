@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   generator: {fileID: 11400000, guid: d43ee555c2b608643bc9f5b1e02f873f, type: 2}
   spawnWeight: 1
+  biomeConnectionRadius: 1
+  biomeConnectionScanSize: 1
   tileAtlas: {fileID: 11400000, guid: e7ded2ce7c405da439dda4686f1dc4ba, type: 2}
   stone: {fileID: 11400000, guid: 85c30e7079a9a664cac4a7b1a49a62f1, type: 2}

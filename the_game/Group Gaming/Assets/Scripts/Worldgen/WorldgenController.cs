@@ -122,8 +122,26 @@ public class WorldgenController : MonoBehaviour
     {
         return this.allTilemapData;
     }
+
+    public void SetTileAt(int x, int y, TileAtlasTile tile)
+    {
+        if (tile == null)
+        {
+            this.allTilemapData.Remove(new Generator.Coord(x, y));
+        }
+        else
+        {
+            this.allTilemapData[new Generator.Coord(x, y)] = tile;
+        }
+        this.tilemap.SetTile(new Vector3Int(x, y, 0), null);
+    }
+
+
     void GenerateWorld(int biomeX, int biomeY, int amountX, int amountY)
     {
+        // Generates the world
+
+        // Loop through each biome amount we want to generate and make the biomes and tiles
         for (int x = biomeX; x < amountX + biomeX; x++)
         {
             for (int y = biomeY; y < amountY + biomeY; y++)
@@ -134,20 +152,20 @@ public class WorldgenController : MonoBehaviour
                 biome.ProcessMap(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
                 biome.FillTilemap(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
                 Dictionary<Generator.Coord, TileAtlasTile> copyOfBiomeTiles = new Dictionary<Generator.Coord, TileAtlasTile>(biome.GetTilemapData());
-                
-                foreach(KeyValuePair<Generator.Coord, TileAtlasTile> kvp in copyOfBiomeTiles)
+
+                foreach (KeyValuePair<Generator.Coord, TileAtlasTile> kvp in copyOfBiomeTiles)
                 {
                     allTilemapData.Add(kvp.Key, kvp.Value);
                 }
 
                 AddBiomeAt(x, y);
-            } 
+            }
         }
     }
 
     void ResetMap()
     {
-        this.generatedBiomes = new HashSet<Generator.Coord> ();
+        this.generatedBiomes = new HashSet<Generator.Coord>();
         this.allTilemapData = new Dictionary<Generator.Coord, TileAtlasTile>();
     }
 
@@ -158,7 +176,7 @@ public class WorldgenController : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             ResetMap();
             foreach (Biome biome in biomes)
@@ -214,13 +232,15 @@ public class WorldgenController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        return;
         // Draw biome map
         foreach (KeyValuePair<Generator.Coord, Biome> kvp in biomeMap)
         {
             if (kvp.Value == biomes[0])
             {
-                Gizmos.color = new Color(0,0,255);
-            } else if (kvp.Value == biomes[1])
+                Gizmos.color = new Color(0, 0, 255);
+            }
+            else if (kvp.Value == biomes[1])
             {
                 Gizmos.color = new Color(255, 0, 0);
             }
