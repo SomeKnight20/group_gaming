@@ -504,12 +504,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   biomes:
   - {fileID: 11400000, guid: b8b00644c98bad54fba68632d113780e, type: 2}
-  - {fileID: 11400000, guid: 3069d3938a9114148880f1bb630ab6f2, type: 2}
-  - {fileID: 11400000, guid: 59691ac54f186f442b47d487d33e513c, type: 2}
-  biomeNoisePixelSize: 50
+  biomeNoisePixelSizeWidth: 100
+  biomeNoisePixelSizeHeight: 30
   biomeNoise: {fileID: 11400000, guid: 4770b72a0b7c2ad43a91cd2e3fca8286, type: 2}
-  generateBiomesX: 4
-  generateBiomesY: 4
+  generateBiomesX: 2
+  generateBiomesY: 2
   tilemap: {fileID: 485069018}
 --- !u!1 &1660953772
 GameObject:

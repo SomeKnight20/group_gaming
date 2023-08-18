@@ -44,7 +44,7 @@ public class Generator : ScriptableObject
                 // If there is air or a solid tile at position
                 if (PositionIsGeneratedAt(x, y))
                 {
-                    // If current position in loop isn't 'the tile'
+                    // Skip current tile we are checking
                     if(x != tileX || y != tileY)
                     {
                         tileCount += (int) map[PositionToCoord(x, y)];
@@ -59,7 +59,7 @@ public class Generator : ScriptableObject
         }
 
         return tileCount;
-    } 
+    }
     public virtual Coord PositionToCoord(int x, int y)
     {
         // Converts a position to coord-object

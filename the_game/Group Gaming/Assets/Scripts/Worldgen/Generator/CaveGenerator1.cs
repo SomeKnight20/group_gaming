@@ -6,12 +6,14 @@ using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-[CreateAssetMenu(menuName = "Worldgen/Generator/CaveGenerator")]
-public class CaveGenerator : Generator
+[CreateAssetMenu(menuName = "Worldgen/Generator/CaveGenerator1")]
+public class CaveGenerator1 : Generator
 {
     [Header("Smoothing")]
     [Tooltip("How many smoothing iterations to do. More = more smooth caves")]
     public int smoothingIterationCount = 4;
+    [Tooltip("How many smoothing iterations to do after paths have been connected")]
+    public int postSmoothingIterationCount = 4;
     [Range(0, 4)]
     [Tooltip("How 'rough' the caves are")]
     public int adjancedTileCountOffset = 0;
@@ -22,7 +24,11 @@ public class CaveGenerator : Generator
     [Tooltip("How many times each cave connects to some other cave. NOTE: This is very performance heavy.")]
     public int caveRoomConnectionIterations = 1;
     [Tooltip("How wide tunnels are created between caves")]
-    public int caveRoomConnectionRadius = 3;
+    public int caveRoomConnectionRadiusMin = 3;
+    public int caveRoomConnectionRadiusMax = 3;
+
+    [Tooltip("How long the connections can be between cave areas")]
+    public int maxConnectionDistance = 999999;
 
     protected List<Thread> caveLineThreads = new List<Thread>();
 
@@ -54,6 +60,12 @@ public class CaveGenerator : Generator
                 caveLineThreads[i].Join();
             }
             caveLineThreads = new List<Thread>();
+        }
+
+        // Use a smoothing algorithm to create caves
+        for (int i = 0; i < postSmoothingIterationCount; i++)
+        {
+            SmoothMap(startX, startY, width, height);
         }
     }
 
@@ -104,7 +116,7 @@ public class CaveGenerator : Generator
         foreach (CaveRoom roomA in caveRooms)
         {
             bool foundPath = false;
-            float bestDistance = 0;
+            float bestDistance = 999999999;
 
             foreach (CaveRoom roomB in caveRooms)
             {
@@ -120,7 +132,7 @@ public class CaveGenerator : Generator
                     {
                         int distanceBetweenRooms = (int)(Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow(tileA.tileY - tileB.tileY, 2));
 
-                        if (distanceBetweenRooms < bestDistance || !foundPath)
+                        if (distanceBetweenRooms < bestDistance)
                         {
                             bestDistance = distanceBetweenRooms;
                             bestTileA = tileA;
@@ -134,7 +146,7 @@ public class CaveGenerator : Generator
             }
             
 
-            if (foundPath)
+            if (foundPath && bestDistance <= maxConnectionDistance)
             {
                 CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
             }
@@ -190,7 +202,7 @@ public class CaveGenerator : Generator
                     }
                 }
             }
-            if (foundPath)
+            if (foundPath && bestDistance <= maxConnectionDistance)
             {
                 CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
             }
@@ -206,6 +218,8 @@ public class CaveGenerator : Generator
             List<Coord> line = GetLine(tileA, tileB);
             foreach (Coord c in line)
             {
+                System.Random rnd = new System.Random();
+                int caveRoomConnectionRadius = rnd.Next(caveRoomConnectionRadiusMin, caveRoomConnectionRadiusMax);
                 DrawCircle(c, caveRoomConnectionRadius);
             }
         });
@@ -375,7 +389,7 @@ public class CaveGenerator : Generator
     }
     private class CaveRoom : IComparable<CaveRoom>
     {
-        public CaveGenerator caveGenerator;
+        public CaveGenerator1 caveGenerator;
         public List<Coord> tiles;
         public List<Coord> edgeTiles;
         public int roomSize = 0; // How many many air tiles in this cave area
@@ -387,7 +401,7 @@ public class CaveGenerator : Generator
 
         }
 
-        public CaveRoom(CaveGenerator caveGenerator, List<Coord> tiles)
+        public CaveRoom(CaveGenerator1 caveGenerator, List<Coord> tiles)
         {
             this.caveGenerator = caveGenerator;
             this.roomSize = tiles.Count;
