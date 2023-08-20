@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Properties;
 using Unity.VisualScripting;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.XR;
 
 public class WorldgenController : MonoBehaviour
 {
+    [Header("Settings")]
+    public GlobalSettings settings;
+
     [Header("Biomes")]
     [Tooltip("Biomes that can spawn")]
     public List<Biome> biomes = new List<Biome>();
@@ -20,21 +24,34 @@ public class WorldgenController : MonoBehaviour
     [Tooltip("How big 1 pixel is on the biome noise map")]
     public int biomeNoisePixelSizeWidth = 50;
     public int biomeNoisePixelSizeHeight = 50;
+    System.Random biomeNoiseRandomizer = new System.Random();
 
     public Noise biomeNoise;
     public int generateBiomesX = 4;
     public int generateBiomesY = 4;
 
+    [Header("Generator Settings")]
+    public bool connectToClosestBiome = true;
+    public bool blendBiomes = true;
+
     public Tilemap tilemap;
+
+    // Debugging
+    public List<Color> colors = new List<Color>();
+    public Dictionary<Generator.Coord, float> noises = new Dictionary<Generator.Coord, float>();
 
     // private Dictionary<Vector2, float> testNoiseMap = new Dictionary<Vector2, float>();
 
     private void Start()
     {
+        biomeNoiseRandomizer = new System.Random(settings.globalSeed);
+
         foreach (Biome biome in biomes)
         {
             biome.SetDefaultTilemap(tilemap);
             biome.SetWorldGenerator(this);
+            biome.SetGlobalSettings(settings);
+            biome.OnStart();
         }
 
         RecalculateBiomeChances();
@@ -75,7 +92,9 @@ public class WorldgenController : MonoBehaviour
 
     float BiomeNoiseAt(int x, int y)
     {
-        float noiseValue = biomeNoise.GetPureNoiseAt(x, y);
+        float noiseValue = biomeNoise.GenerateOctavePerlinAt(x, y);
+        // Perlin noise is bad at making random biome maps, since the more biomes the more the last ones are?
+        //float noiseValue = (float) biomeNoiseRandomizer.NextDouble();
         return noiseValue;
     }
 
@@ -84,20 +103,21 @@ public class WorldgenController : MonoBehaviour
         Generator.Coord biomePos = PositionToBiomePos(x, y);
         return biomeMap[biomePos];
     }
-    Biome BiomeAtBiomeCoords(int biomeX, int biomeY)
+    public Biome BiomeAtBiomeCoords(int biomeX, int biomeY)
     {
         return biomeMap[new Generator.Coord(biomeX, biomeY)];
     }
     void GenerateBiomeMapAreaAt(int startX, int startY, int width, int height)
     {
         // Generates a biome map for a certain area
-
+        noises.Clear();
         // Loop through each coordinate
         for (int x = startX; x < width + startX; x++)
         {
             for (int y = startY; y < height + startY; y++)
             {
                 float noiseValue = BiomeNoiseAt(x, y);
+                noises.Add(new Generator.Coord(x, y), noiseValue);
 
                 foreach (KeyValuePair<Biome, float> kvp in biomeSpawnChances)
                 {
@@ -123,23 +143,37 @@ public class WorldgenController : MonoBehaviour
         return this.allTilemapData;
     }
 
+    public TileAtlasTile GetTileAt(int x, int y)
+    {
+        return allTilemapData[new Generator.Coord(x, y)];
+    }
+
     public void SetTileAt(int x, int y, TileAtlasTile tile)
     {
+        SetTileAt(new Generator.Coord(x, y), tile);
+    }
+
+    public void SetTileAt(Generator.Coord coord, TileAtlasTile tile)
+    {
+        TileBase tileBase = null;
         if (tile == null)
         {
-            this.allTilemapData.Remove(new Generator.Coord(x, y));
+            this.allTilemapData.Remove(coord);
         }
         else
         {
-            this.allTilemapData[new Generator.Coord(x, y)] = tile;
+            this.allTilemapData[coord] = tile;
+            tileBase = tile.tile;
         }
-        this.tilemap.SetTile(new Vector3Int(x, y, 0), null);
+        this.tilemap.SetTile(new Vector3Int(coord.tileX, coord.tileY, 0), tileBase);
     }
 
 
     void GenerateWorld(int biomeX, int biomeY, int amountX, int amountY)
     {
         // Generates the world
+
+        ResetRandomizers();
 
         // Loop through each biome amount we want to generate and make the biomes and tiles
         for (int x = biomeX; x < amountX + biomeX; x++)
@@ -148,14 +182,20 @@ public class WorldgenController : MonoBehaviour
             {
                 Biome biome = BiomeAtBiomeCoords(x, y);
                 biome.CreateMapFromArea(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
-                biome.ConnectToClosestBiome(x, y);
+
+                if (this.connectToClosestBiome)
+                {
+                    biome.ConnectToClosestBiome(x, y);
+                }
+
                 biome.ProcessMap(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
                 biome.FillTilemap(x * biomeNoisePixelSizeWidth, y * biomeNoisePixelSizeHeight, biomeNoisePixelSizeWidth, biomeNoisePixelSizeHeight);
-                Dictionary<Generator.Coord, TileAtlasTile> copyOfBiomeTiles = new Dictionary<Generator.Coord, TileAtlasTile>(biome.GetTilemapData());
+                biome.FillBiomePassages();
 
-                foreach (KeyValuePair<Generator.Coord, TileAtlasTile> kvp in copyOfBiomeTiles)
+
+                if (this.blendBiomes)
                 {
-                    allTilemapData.Add(kvp.Key, kvp.Value);
+                    biome.BlendIntoSurroundedBiomes(x, y);
                 }
 
                 AddBiomeAt(x, y);
@@ -163,10 +203,19 @@ public class WorldgenController : MonoBehaviour
         }
     }
 
+    void ResetRandomizers()
+    {
+        biomeNoiseRandomizer = new System.Random(settings.globalSeed);
+    }
+
     void ResetMap()
     {
-        this.generatedBiomes = new HashSet<Generator.Coord>();
-        this.allTilemapData = new Dictionary<Generator.Coord, TileAtlasTile>();
+        generatedBiomes.Clear();
+        allTilemapData.Clear();
+        foreach (Biome biome in biomes)
+        {
+            biome.OnStart();
+        }
     }
 
     public bool TileExistsAt(int x, int y)
@@ -174,11 +223,17 @@ public class WorldgenController : MonoBehaviour
         return this.allTilemapData.ContainsKey(new Generator.Coord(x, y));
     }
 
+    public bool TileExistsAt(Generator.Coord coord)
+    {
+        return this.allTilemapData.ContainsKey(coord);
+    }
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
             ResetMap();
+            ResetRandomizers();
             foreach (Biome biome in biomes)
             {
                 biome.ResetMap();
@@ -187,69 +242,31 @@ public class WorldgenController : MonoBehaviour
             GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSizeWidth, generateBiomesY * biomeNoisePixelSizeHeight);
             GenerateWorld(0, 0, generateBiomesX, generateBiomesY);
         }
-        if (Input.GetMouseButtonDown(2))
-        {
-            /*testNoiseMap.Clear();
-
-            RecalculateBiomeChances();
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    float noiseValue = BiomeNoiseAt(x,y);
-
-                    float color1 = 0f;
-                    float color2 = 1f;
-                    float color3 = 0.5f;
-
-                    int i = 0;
-                    foreach (KeyValuePair<Biome, float> kvp in biomeSpawnChances)
-                    {
-                        i++;
-                        if(noiseValue < kvp.Value)
-                        {
-                            noiseValue = kvp.Value;
-
-                            if (i == 1)
-                            {
-                                noiseValue = color1;
-                            } else if (i == 2)
-                            {
-                                noiseValue = color2;
-                            } else if ( i == 3)
-                            {
-                                noiseValue = color3;
-                            }
-                            testNoiseMap[new Vector2(x, y)] = noiseValue;
-                            break;
-                        }
-                    }
-
-                }
-            }*/
-        }
     }
 
     private void OnDrawGizmos()
     {
-        return;
-        // Draw biome map
-        foreach (KeyValuePair<Generator.Coord, Biome> kvp in biomeMap)
+        //return;
+        // Draw biome map, Causes big lag but good for changing biome noise
+        /*foreach (KeyValuePair<Generator.Coord, Biome> kvp in biomeMap)
         {
-            if (kvp.Value == biomes[0])
+            for(int i = 0; i < biomes.Count; i++)
             {
-                Gizmos.color = new Color(0, 0, 255);
-            }
-            else if (kvp.Value == biomes[1])
-            {
-                Gizmos.color = new Color(255, 0, 0);
-            }
-            else
-            {
-                Gizmos.color = new Color(0, 255, 0);
+                if (kvp.Value == biomes[i])
+                {
+                    Gizmos.color = colors[i];
+                    break;
+                }
             }
             Vector3 pos = new Vector3(kvp.Key.tileX, kvp.Key.tileY, 0);
             Gizmos.DrawCube(pos, Vector3.one);
-        }
+        }*/
+        /*foreach (KeyValuePair<Generator.Coord, float> kvp in noises)
+        {
+            float color = 1 * kvp.Value;
+            Gizmos.color = new Color(color, color, color, 255);
+            Vector3 pos = new Vector3(kvp.Key.tileX, kvp.Key.tileY, 0);
+            Gizmos.DrawCube(pos, Vector3.one);
+        }*/
     }
 }
