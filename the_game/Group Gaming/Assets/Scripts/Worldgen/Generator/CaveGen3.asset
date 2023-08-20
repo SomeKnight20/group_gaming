@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: CaveGen3
   m_EditorClassIdentifier: 
   noise: {fileID: 11400000, guid: adaf896347e48be4ba464293107a6abf, type: 2}
-  smoothingIterationCount: 4
+  smoothingIterationCount: 2
+  postSmoothingIterationCount: 2
   adjancedTileCountOffset: 0
   minCaveRoomSize: 30
-  caveRoomConnectionIterations: 2
-  caveRoomConnectionRadius: 1
+  caveRoomConnectionIterations: 1
+  caveRoomConnectionRadiusMin: 1
+  caveRoomConnectionRadiusMax: 3
+  maxConnectionDistance: 999999

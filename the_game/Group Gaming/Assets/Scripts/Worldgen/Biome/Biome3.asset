@@ -10,11 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 57b027a7f45dff54cbf6d13c8e2706e0, type: 3}
-  m_Name: WideCave1
+  m_Name: Biome3
   m_EditorClassIdentifier: 
   generator: {fileID: 11400000, guid: ee3e9aceb12d5754986227b124b245df, type: 2}
-  spawnWeight: 3
-  biomeConnectionRadius: 3
-  biomeConnectionScanSize: 0
+  spawnWeight: 1
+  biomeConnectionRadiusMin: 3
+  biomeConnectionRadiusMax: 6
+  biomeConnectionScanSize: 3
+  forceConnectToTopBiome: 1
+  forceConnectToBottomBiome: 1
+  forceConnectToLeftBiome: 1
+  forceConnectToRightBiome: 1
+  connectToRandomBiome: 1
+  minBlendRadius: 3
+  maxBlendRadius: 8
+  allowEmptyBlending: 0
+  useLastTileIfEmptyBlend: 1
   tileAtlas: {fileID: 11400000, guid: e7ded2ce7c405da439dda4686f1dc4ba, type: 2}
   stone: {fileID: 11400000, guid: b2ac4aa68d941984aa529e4bd6f312e7, type: 2}

@@ -13,7 +13,7 @@ public class DefaultCaveBiome : Biome
 
         Dictionary<Generator.Coord, TileType> map = generator.GetMapData();
 
-        foreach(KeyValuePair<Generator.Coord, TileType> tile in map)
+        foreach (KeyValuePair<Generator.Coord, TileType> tile in map)
         {
             Generator.Coord coord = tile.Key;
             TileType tileType = tile.Value;

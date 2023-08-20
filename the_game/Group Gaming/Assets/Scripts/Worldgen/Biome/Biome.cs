@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.Tilemaps;
 using static Generator;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
@@ -37,15 +39,41 @@ public class Biome : ScriptableObject
     [Tooltip("Should biome try to force connect to a random biome (Only if any biome around this one is generated)")]
     public bool connectToRandomBiome = true;
 
+    [Header("Biome Blending")]
+    [Tooltip("Minimum radius for blending circle")]
+    public int minBlendRadius = 0;
+    [Tooltip("Maximum radius for blending circle")]
+    public int maxBlendRadius = 8;
+    [Tooltip("If there is an empty tile to blend, should we blend with it or ignore this position")]
+    public bool allowEmptyBlending = false;
+    [Tooltip("If there is an empty tile to blend, should we blend with the last tile we used instead. NOTE: 'allowEmptyBlending' must be false")]
+    public bool useLastTileIfEmptyBlend = true;
 
     [Header("Tiles")]
     public TileAtlas tileAtlas;
     protected Tilemap tilemap;
 
+    // Global settings
+    protected GlobalSettings settings;
+
     // Connected to biomes
     public HashSet<Biome> connectedBiomes = new HashSet<Biome>();
 
     protected Dictionary<Coord, TileAtlasTile> tilemapData = new Dictionary<Coord, TileAtlasTile>();
+
+    // Biome passages
+    protected List<Coord> biomePassageCoords = new List<Coord>();
+
+    public virtual void OnStart()
+    {
+        generator.OnStart();
+    }
+
+    public void SetGlobalSettings(GlobalSettings globalSettings)
+    {
+        this.settings = globalSettings;
+        generator.SetGlobalSettings(globalSettings);
+    }
 
     public virtual void SetDefaultTilemap(Tilemap tilemap)
     {
@@ -65,8 +93,9 @@ public class Biome : ScriptableObject
     public virtual void ResetMap()
     {
         generator.ResetMap();
-        tilemapData = new Dictionary<Coord, TileAtlasTile>();
-        connectedBiomes = new HashSet<Biome>();
+        tilemapData.Clear();
+        connectedBiomes.Clear();
+        biomePassageCoords.Clear();
 
         if (this.tilemap == null)
         {
@@ -100,12 +129,104 @@ public class Biome : ScriptableObject
         {
             Coord coord = tile.Key;
             TileAtlasTile tileData = tile.Value;
-            tilemap.SetTile(new Vector3Int(coord.tileX, coord.tileY, 0), tileData.tile);
+            worldGenerator.SetTileAt(coord, tileData);
         }
 
         generator.ResetMap();
     }
 
+    public virtual void BlendIntoSurroundedBiomes(int biomeX, int biomeY)
+    {
+        int x;
+        int y;
+        System.Random rand = new System.Random(settings.globalSeed); // Random number generator
+        int radius = rand.Next(minBlendRadius, maxBlendRadius);
+        TileAtlasTile blendingTile = null; // What tile to blend with
+
+        // If there is biome below and it's not the same as this biome
+        if (worldGenerator.IsBiomeGeneratedAt(biomeX, biomeY - 1) && worldGenerator.BiomeAtBiomeCoords(biomeX, biomeY - 1) != this)
+        {
+            // Blending into bottom biome
+            y = biomeY * worldGenerator.biomeNoisePixelSizeHeight;
+            for (x = biomeX * worldGenerator.biomeNoisePixelSizeWidth; x < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; x += radius)
+            {
+                DoBlending(x, y, ref blendingTile, radius);
+                radius = rand.Next(minBlendRadius, maxBlendRadius); // Generate a new random radius to make the blending better
+            }
+        }
+
+        // If there is biome above and it's not the same as this biome
+        if (worldGenerator.IsBiomeGeneratedAt(biomeX, biomeY + 1) && worldGenerator.BiomeAtBiomeCoords(biomeX, biomeY + 1) != this)
+        {
+            // Blending into above biome
+            y = (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight - 1;
+            for (x = biomeX * worldGenerator.biomeNoisePixelSizeWidth; x < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; x += radius)
+            {
+                DoBlending(x, y, ref blendingTile, radius);
+                radius = rand.Next(minBlendRadius, maxBlendRadius); // Generate a new random radius to make the blending better
+            }
+        }
+
+        // If there is biome to the left and it's not the same as this biome
+        if (worldGenerator.IsBiomeGeneratedAt(biomeX - 1, biomeY) && worldGenerator.BiomeAtBiomeCoords(biomeX - 1, biomeY) != this)
+        {
+            // Blending into left biome
+            x = biomeX * worldGenerator.biomeNoisePixelSizeWidth;
+            for (y = biomeY * worldGenerator.biomeNoisePixelSizeHeight; y < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; y += radius)
+            {
+                DoBlending(x, y, ref blendingTile, radius);
+                radius = rand.Next(minBlendRadius, maxBlendRadius); // Generate a new random radius to make the blending better
+            }
+        }
+
+        // If there is biome to the right and it's not the same as this biome
+        if (worldGenerator.IsBiomeGeneratedAt(biomeX + 1, biomeY) && worldGenerator.BiomeAtBiomeCoords(biomeX + 1, biomeY) != this)
+        {
+            // Blending into right biome
+            x = (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth - 1;
+            for (y = biomeY * worldGenerator.biomeNoisePixelSizeHeight; y < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; y += radius)
+            {
+                DoBlending(x, y, ref blendingTile, radius);
+                radius = rand.Next(minBlendRadius, maxBlendRadius); // Generate a new random radius to make the blending better
+            }
+        }
+    }
+    protected void DoBlending(int x, int y, ref TileAtlasTile blendingTile, int radius)
+    {
+        // If there is no tile or air at a position
+        if (!worldGenerator.TileExistsAt(x, y))
+        {
+            // If we want to blend with air
+            if (allowEmptyBlending)
+            {
+                blendingTile = null;
+
+            }
+            // If we want to use the last tile we blended with
+            else if (!useLastTileIfEmptyBlend && blendingTile != null)
+            {
+                return;
+            }
+        }
+        else // If a tile exists at (x,y)
+        {
+            blendingTile = worldGenerator.GetTileAt(x, y);
+        }
+
+        List<Coord> circleCoords = DrawCircle(new Coord(x, y), radius); // List of blending tiles
+
+        // Blend tiles
+        foreach (Coord coord in circleCoords)
+        {
+            // We don't want to blend into air
+            if (!worldGenerator.TileExistsAt(coord))
+            {
+                continue;
+            }
+            worldGenerator.SetTileAt(coord, blendingTile);
+        }
+
+    }
     public void ConnectToClosestBiome(int biomeX, int biomeY)
     {
         // Connects this biome to the closes one nearby
@@ -135,7 +256,8 @@ public class Biome : ScriptableObject
             List<Coord> coords;
 
             // Pick random biome
-            int index = UnityEngine.Random.Range(0, nearbyBiomes.Count - 1);
+            System.Random rand = new System.Random(settings.globalSeed);
+            int index = rand.Next(0, nearbyBiomes.Count - 1);
             KeyValuePair<Coord, Biome> closestBiomePair = nearbyBiomes.ElementAt(index);
             int closestBiomeX = closestBiomePair.Key.tileX;
             int closestBiomeY = closestBiomePair.Key.tileY;
@@ -145,25 +267,38 @@ public class Biome : ScriptableObject
             if (closestBiomeX > biomeX && connectToRandomBiome || (forceConnectToRightBiome && worldGenerator.IsBiomeGeneratedAt(biomeX + 1, biomeY)))
             {
                 coords = ClosestBiomeTileFromRight(biomeX, biomeY, biomeX + 1, biomeY);
-                CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX + 1, biomeY);
+
+                if (coords.Count > 1)
+                {
+                    CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX + 1, biomeY);
+                }
             }
             // If closest biome is to the left
             if (closestBiomeX < biomeX && connectToRandomBiome || (forceConnectToLeftBiome && worldGenerator.IsBiomeGeneratedAt(biomeX - 1, biomeY)))
             {
                 coords = ClosestBiomeTileFromLeft(biomeX, biomeY, biomeX - 1, biomeY);
-                CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX - 1, biomeY);
+                if (coords.Count > 1)
+                {
+                    CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX - 1, biomeY);
+                }
             }
             // If closest biome is above
             if (closestBiomeY > biomeY && connectToRandomBiome || (forceConnectToTopBiome && worldGenerator.IsBiomeGeneratedAt(biomeX, biomeY + 1)))
             {
                 coords = ClosestBiomeTileFromTop(biomeX, biomeY, biomeX, biomeY + 1);
-                CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX, biomeY + 1);
+                if (coords.Count > 1)
+                {
+                    CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX, biomeY + 1);
+                }
             }
             // If closest biome is below
             if (closestBiomeY < biomeY && connectToRandomBiome || (forceConnectToBottomBiome && worldGenerator.IsBiomeGeneratedAt(biomeX, biomeY - 1)))
             {
                 coords = ClosestBiomeTileFromBottom(biomeX, biomeY, biomeX, biomeY - 1);
-                CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX, biomeY - 1);
+                if (coords.Count > 1)
+                {
+                    CreatePassageToBiome(closestBiome, coords[0], coords[1], biomeX, biomeY, biomeX, biomeY - 1);
+                }
             }
         }
     }
@@ -414,36 +549,46 @@ public class Biome : ScriptableObject
 
 
         List<Coord> line = GetLine(bestTileA, bestTileB);
+        System.Random rand = new System.Random(settings.globalSeed);
         foreach (Coord c in line)
         {
-            int biomeConnectionRadius = UnityEngine.Random.Range(biomeConnectionRadiusMin, biomeConnectionRadiusMax);
-            DrawCircle(biome, c, biomeConnectionRadius, biomeXA, biomeYA, biomeXB, biomeYB);
+            int biomeConnectionRadius = rand.Next(biomeConnectionRadiusMin, biomeConnectionRadiusMax);
+            List<Coord> circleCoords = DrawCircle(c, biomeConnectionRadius);
+
+            // Add coords to biomepassage list to process them later
+            foreach (Coord coord in circleCoords)
+            {
+                biomePassageCoords.Add(coord);
+            }
         }
     }
 
-    void DrawCircle(Biome biome, Coord c, int r, int biomeXA, int biomeYA, int biomeXB, int biomeYB)
+    List<Coord> DrawCircle(Coord c, int r)
     {
-        // ???
+        // Returns a list of coords forming a circle
+
+        List<Coord> circleCoords = new List<Coord>();
         for (int x = -r; x <= r; x++)
         {
             for (int y = -r; y <= r; y++)
             {
                 if (x * x + y * y <= r * r)
                 {
-                    int drawX = c.tileX + x;
-                    int drawY = c.tileY + y;
-                    if (IsInBiomeBounds(biomeXA, biomeYA, drawX, drawY))
-                    {
-                        generator.map[new Coord(drawX, drawY)] = 0;
-                    }
-                    else if (biome != null)
-                    {
-                        //biome.DrawCircle(null, c, r, biomeXB, biomeYB, 0, 0);
-                        worldGenerator.SetTileAt(drawX, drawY, null);
-                    }
+                    circleCoords.Add(new Coord(c.tileX + x, c.tileY + y));
                 }
             }
         }
+        return circleCoords;
+    }
+
+    public void FillBiomePassages()
+    {
+        // Fills biome passages to tilemap aka creates air
+        foreach (Coord tile in biomePassageCoords)
+        {
+            worldGenerator.SetTileAt(tile.tileX, tile.tileY, null);
+        }
+        biomePassageCoords.Clear();
     }
 
     bool IsInBiomeBounds(int biomeX, int biomeY, int x, int y)

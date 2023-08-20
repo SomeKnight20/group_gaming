@@ -467,7 +467,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 701714366}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 3.1936173, y: -1.5787627, z: -0.073577754}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -502,14 +502,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f773633b48c76ef44a64d408d7a4ce35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 1ac1da7e114f1ab46a41bd59f388e880, type: 2}
   biomes:
   - {fileID: 11400000, guid: b8b00644c98bad54fba68632d113780e, type: 2}
+  - {fileID: 11400000, guid: 3069d3938a9114148880f1bb630ab6f2, type: 2}
+  - {fileID: 11400000, guid: 59691ac54f186f442b47d487d33e513c, type: 2}
   biomeNoisePixelSizeWidth: 100
   biomeNoisePixelSizeHeight: 30
   biomeNoise: {fileID: 11400000, guid: 4770b72a0b7c2ad43a91cd2e3fca8286, type: 2}
-  generateBiomesX: 2
-  generateBiomesY: 2
+  generateBiomesX: 6
+  generateBiomesY: 10
+  connectToClosestBiome: 1
+  blendBiomes: 1
   tilemap: {fileID: 485069018}
+  colors:
+  - {r: 1, g: 0.94731724, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 0.3207547, b: 0, a: 1}
+  - {r: 0.31083125, g: 0.5188679, b: 0.49137083, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0.9031024, a: 1}
+  - {r: 0.49517727, g: 0, b: 1, a: 1}
 --- !u!1 &1660953772
 GameObject:
   m_ObjectHideFlags: 0

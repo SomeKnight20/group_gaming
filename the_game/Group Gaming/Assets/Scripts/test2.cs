@@ -26,7 +26,8 @@ public class test2 : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if (backgroundThread != null) {
+        if (backgroundThread != null)
+        {
             backgroundThread.Abort();
         }
         biome.GetGenerator().ResetMap();
@@ -35,7 +36,7 @@ public class test2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             GenerateWorld();
         }
@@ -63,7 +64,7 @@ public class test2 : MonoBehaviour
         {
             return;
         }
-        foreach(KeyValuePair<Generator.Coord, TileType> tile in biome.GetGenerator().map)
+        foreach (KeyValuePair<Generator.Coord, TileType> tile in biome.GetGenerator().map)
         {
             Gizmos.color = (tile.Value == TileType.SOLID) ? Color.black : Color.white;
             Vector3 pos = new Vector3(tile.Key.tileX, tile.Key.tileY, 0);

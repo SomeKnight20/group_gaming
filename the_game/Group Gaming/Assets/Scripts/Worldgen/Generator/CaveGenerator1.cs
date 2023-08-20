@@ -26,11 +26,20 @@ public class CaveGenerator1 : Generator
     [Tooltip("How wide tunnels are created between caves")]
     public int caveRoomConnectionRadiusMin = 3;
     public int caveRoomConnectionRadiusMax = 3;
+    System.Random roomConnectionRandom = new System.Random();
 
     [Tooltip("How long the connections can be between cave areas")]
     public int maxConnectionDistance = 999999;
 
     protected List<Thread> caveLineThreads = new List<Thread>();
+
+
+    public override void OnStart()
+    {
+        base.OnStart();
+
+        roomConnectionRandom = new System.Random(settings.globalSeed);
+    }
 
     public override void CreateMapFromArea(int startX, int startY, int width, int height)
     {
@@ -49,7 +58,7 @@ public class CaveGenerator1 : Generator
             caveRooms[0].SetConnectedToMainRoom(true);
 
             // Connect caves together
-            for(int i = 0; i < caveRoomConnectionIterations; i++)
+            for (int i = 0; i < caveRoomConnectionIterations; i++)
             {
                 ConnectClosestCaveRooms(caveRooms);
             }
@@ -144,7 +153,7 @@ public class CaveGenerator1 : Generator
                     }
                 }
             }
-            
+
 
             if (foundPath && bestDistance <= maxConnectionDistance)
             {
@@ -218,8 +227,7 @@ public class CaveGenerator1 : Generator
             List<Coord> line = GetLine(tileA, tileB);
             foreach (Coord c in line)
             {
-                System.Random rnd = new System.Random();
-                int caveRoomConnectionRadius = rnd.Next(caveRoomConnectionRadiusMin, caveRoomConnectionRadiusMax);
+                int caveRoomConnectionRadius = roomConnectionRandom.Next(caveRoomConnectionRadiusMin, caveRoomConnectionRadiusMax);
                 DrawCircle(c, caveRoomConnectionRadius);
             }
         });
@@ -320,7 +328,7 @@ public class CaveGenerator1 : Generator
             for (int y = startY; y < startY + height; y++)
             {
                 // If current tile is air and it is not already a part of some cave room
-                if (AirExistsAt(x, y) && !checkedTiles.Contains(PositionToCoord(x,y)))
+                if (AirExistsAt(x, y) && !checkedTiles.Contains(PositionToCoord(x, y)))
                 {
                     List<Coord> airTiles = MapCaveRoomAt(x, y);
                     CaveRoom room = new CaveRoom(this, airTiles);
@@ -332,7 +340,7 @@ public class CaveGenerator1 : Generator
                     }
                     else
                     {
-                        foreach(Coord coord in room.tiles)
+                        foreach (Coord coord in room.tiles)
                         {
                             checkedTiles.Add(coord);
                         }
@@ -366,7 +374,7 @@ public class CaveGenerator1 : Generator
         {
             return mapped;
         }
-        
+
         // Remember that we visited this position
         visited.Add(pos);
 
@@ -408,8 +416,8 @@ public class CaveGenerator1 : Generator
             this.tiles = tiles;
             this.edgeTiles = new List<Coord>();
             this.connectedRooms = new List<CaveRoom>();
-            
-            foreach(Coord tile in tiles)
+
+            foreach (Coord tile in tiles)
             {
                 // Finds edge tiles
                 for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++)
@@ -446,7 +454,7 @@ public class CaveGenerator1 : Generator
                 return allConnectedRooms;
             }
             allConnectedRooms.Add(this);
-            
+
             // Loop through each connected room and repeat this process
             foreach (CaveRoom room in connectedRooms)
             {
@@ -499,7 +507,7 @@ public class CaveGenerator1 : Generator
 
         public void Fill()
         {
-            foreach(Coord tile in tiles)
+            foreach (Coord tile in tiles)
             {
                 caveGenerator.SetTileAt(tile, TileType.SOLID);
             }
