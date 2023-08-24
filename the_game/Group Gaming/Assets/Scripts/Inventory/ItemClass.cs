@@ -27,6 +27,8 @@ public class ItemClass : ScriptableObject
     public Sprite itemIcon;
     public bool isStackable = true;
 
+    public string description;
+
     public virtual void Use(PlayerInventoryController caller){
         Debug.Log("Used item");
     }

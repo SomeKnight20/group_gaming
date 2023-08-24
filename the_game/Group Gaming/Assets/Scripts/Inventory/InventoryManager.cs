@@ -12,6 +12,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject hotbarSlotHolder;
     [SerializeField] private ItemClass itemToAdd;
     [SerializeField] private ItemClass itemToRemove;
+    [SerializeField] private TMP_Text descriptionText;
 
     [SerializeField] private SlotClass[] startingItems;
 
@@ -88,52 +89,62 @@ public class InventoryManager : MonoBehaviour
             // armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
 
             if(items[slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "primary")
+                if (items[slots.Length - hotbarSlots.Length].GetItem().GetTool() == null)
                 {
-                    ItemClass tempAddedItem = items[slots.Length - hotbarSlots.Length].GetItem();
-                    int tempAddedAmount = items[slots.Length - hotbarSlots.Length].GetQuantity();
-                    items[slots.Length - hotbarSlots.Length].Clear();
-                    Add(tempAddedItem, tempAddedAmount);
+                    // ItemClass tempAddedItem = items[slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(0);
                 } else primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
             }
 
             if(items[1 + slots.Length - hotbarSlots.Length].GetItem() != null){
                 if (items[1 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "secondary")
                 {
-                    ItemClass tempAddedItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
-                    int tempAddedAmount = items[1 + slots.Length - hotbarSlots.Length].GetQuantity();
-                    items[1 + slots.Length - hotbarSlots.Length].Clear();
-                    Add(tempAddedItem, tempAddedAmount);
+                    // ItemClass tempAddedItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[1 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[1 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(1);
                 } else secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
             }
 
             if(items[2 + slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[2 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "consumable")
+                if (items[2 + slots.Length - hotbarSlots.Length].GetItem().GetConsumable() == null)
                 {
-                    ItemClass tempAddedItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
-                    int tempAddedAmount = items[2 + slots.Length - hotbarSlots.Length].GetQuantity();
-                    items[2 + slots.Length - hotbarSlots.Length].Clear();
-                    Add(tempAddedItem, tempAddedAmount);
+                    // ItemClass tempAddedItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[2 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[2 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(2);
                 } else consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
             }
 
             if(items[3 + slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[3 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "armor")
+                if (items[3 + slots.Length - hotbarSlots.Length].GetItem().GetArmor() == null)
                 {
-                    ItemClass tempAddedItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
-                    int tempAddedAmount = items[3 + slots.Length - hotbarSlots.Length].GetQuantity();
-                    items[3 + slots.Length - hotbarSlots.Length].Clear();
-                    Add(tempAddedItem, tempAddedAmount);
+                    // ItemClass tempAddedItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[3 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[3 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(3);
                 } else armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
             }
 
             if(items[4 + slots.Length - hotbarSlots.Length].GetItem() != null){
                 if (items[4 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "accessory")
                 {
-                    ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
-                    int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
-                    items[4 + slots.Length - hotbarSlots.Length].Clear();
-                    Add(tempAddedItem, tempAddedAmount);
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(4);
                 } else armorItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
             }
 
@@ -149,7 +160,28 @@ public class InventoryManager : MonoBehaviour
             }
         } 
 
-        // Debug.Log(items[slots.Length - hotbarSlots.Length].GetItem().itemSlotType);
+        // Debug.Log(GetClosestSlot().GetItem().description);
+
+        // if(GetClosestSlot().GetItem() != null){
+        //     descriptionText.text = GetClosestSlot().GetItem().description;
+        // } else descriptionText.text = "";
+
+        if(isMovingItem == false){
+
+            try {
+            if(GetClosestSlot().GetItem() != null){
+            descriptionText.text = GetClosestSlot().GetItem().description;
+            } else descriptionText.text = "";
+            } catch {
+            descriptionText.text = "";
+            }
+
+        }
+        
+
+        // descriptionText.text = GetClosestSlot().GetItem().description;
+
+        // Debug.Log(items[2 + slots.Length - hotbarSlots.Length].GetItem().GetConsumable());
         // //VAIHA PRIMARY ITEMIKS JA JOKASELLE ITEMILLE OMA SLOTTI
         // //OPTIMOI JOS MAHOLLISTA
         // primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
@@ -268,6 +300,14 @@ public class InventoryManager : MonoBehaviour
 
         return null;
     }
+
+    public void CheckSlot(int multiplier){
+        ItemClass tempAddedItem = items[multiplier + slots.Length - hotbarSlots.Length].GetItem();
+        int tempAddedAmount = items[multiplier + slots.Length - hotbarSlots.Length].GetQuantity();
+        items[multiplier + slots.Length - hotbarSlots.Length].Clear();
+        Add(tempAddedItem, tempAddedAmount);
+    }
+
     #endregion Inventory Utils
 
     #region Moving Stuff
@@ -277,7 +317,6 @@ public class InventoryManager : MonoBehaviour
         if (originalSlot == null || originalSlot.GetItem() == null){
             return false; //No item to move
         }
-
         movingSlot = new SlotClass(originalSlot);
         originalSlot.Clear();
         isMovingItem = true;
@@ -330,6 +369,7 @@ public class InventoryManager : MonoBehaviour
                     tempSlot = new SlotClass(originalSlot);//a = b
                     originalSlot.AddItem(movingSlot.GetItem(), movingSlot.GetQuantity());//b = c
                     movingSlot.AddItem(tempSlot.GetItem(), tempSlot.GetQuantity());//a = c
+                    descriptionText.text = movingSlot.GetItem().description;
                     RefreshUI();
                     return true;
                 }
@@ -355,13 +395,13 @@ public class InventoryManager : MonoBehaviour
             return false;
         }
 
-        movingSlot.SubQuantity(1);
-
         if (originalSlot.GetItem() != null && originalSlot.GetItem() == movingSlot.GetItem()) {
             originalSlot.AddQuantity(1);
         } else {
             originalSlot.AddItem(movingSlot.GetItem(), 1);
         }
+
+        movingSlot.SubQuantity(1);
 
         if (movingSlot.GetQuantity() < 1){
             isMovingItem = false;

@@ -16,4 +16,5 @@ MonoBehaviour:
   itemSlotType: consumable
   itemIcon: {fileID: 21300000, guid: c8716419db3e9fc4797e74c354a6a8fa, type: 3}
   isStackable: 1
+  description: Omena
   healthAdded: 5

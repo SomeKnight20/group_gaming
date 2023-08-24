@@ -123,8 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
-<<<<<<< HEAD
-=======
 --- !u!1001 &275719976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -316,7 +314,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
->>>>>>> 4f9c2c68902292642c6805440700355bf7f046f5
 --- !u!1 &760774793
 GameObject:
   m_ObjectHideFlags: 0
@@ -32097,17 +32094,6 @@ BoxCollider2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-<<<<<<< HEAD
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
---- !u!4 &842133794 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6994979579798328911, guid: ad04c52196f571447a0aff2340ce89fb, type: 3}
-  m_PrefabInstance: {fileID: 601164461557851877}
-  m_PrefabAsset: {fileID: 0}
-=======
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -32262,7 +32248,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f1136b0debbe48a458208382a3ea156a, type: 3}
->>>>>>> 4f9c2c68902292642c6805440700355bf7f046f5
 --- !u!1 &1344771503
 GameObject:
   m_ObjectHideFlags: 0
@@ -32308,69 +32293,6 @@ Transform:
   - {fileID: 760774794}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-<<<<<<< HEAD
---- !u!1001 &1808341614
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1829311273888839159, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_Name
-      value: Main Camera
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3988254471059215246, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8042736649856632602, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-      propertyPath: target
-      value: 
-      objectReference: {fileID: 842133794}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1229cd20912d0074e9eb507384c27d1d, type: 3}
-=======
 --- !u!1 &1631314028
 GameObject:
   m_ObjectHideFlags: 0
@@ -32432,7 +32354,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
->>>>>>> 4f9c2c68902292642c6805440700355bf7f046f5
 --- !u!1 &1951021655
 GameObject:
   m_ObjectHideFlags: 0
@@ -32721,11 +32642,7 @@ SceneRoots:
   - {fileID: 601164461557851877}
   - {fileID: 7200369466631194388}
   - {fileID: 1951021657}
-<<<<<<< HEAD
-  - {fileID: 1808341614}
-=======
   - {fileID: 2263393666457024138}
   - {fileID: 1631314029}
   - {fileID: 1050575327}
   - {fileID: 1344771505}
->>>>>>> 4f9c2c68902292642c6805440700355bf7f046f5
