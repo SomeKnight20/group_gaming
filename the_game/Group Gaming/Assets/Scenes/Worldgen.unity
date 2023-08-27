@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffde243f4db1b0341b5cc6589f07790a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noise: {fileID: 11400000, guid: ef122142aaae81f4aa8f3fcf00074dae, type: 2}
+  noise: {fileID: 11400000, guid: 7e8486f2237637a4188b2d5e9a936f4d, type: 2}
   width: 256
   height: 256
   isPixels: 1
@@ -454,14 +454,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3069d3938a9114148880f1bb630ab6f2, type: 2}
   - {fileID: 11400000, guid: 59691ac54f186f442b47d487d33e513c, type: 2}
   copyChanceOfABiome: 0.5
-  biomeNoisePixelSizeWidth: 5
-  biomeNoisePixelSizeHeight: 5
-  biomeNoise: {fileID: 11400000, guid: 4770b72a0b7c2ad43a91cd2e3fca8286, type: 2}
-  generateBiomesX: 25
-  generateBiomesY: 25
-  connectToClosestBiome: 0
-  blendBiomes: 0
   tilemap: {fileID: 485069018}
+  biomeNoisePixelSizeWidth: 70
+  biomeNoisePixelSizeHeight: 25
+  generateBiomesX: 3
+  generateBiomesY: 5
+  connectToClosestBiome: 1
+  blendBiomes: 1
   colors:
   - {r: 1, g: 0.94731724, b: 0, a: 1}
   - {r: 0, g: 0, b: 1, a: 1}

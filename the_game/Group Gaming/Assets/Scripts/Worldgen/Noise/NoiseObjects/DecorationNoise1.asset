@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4538775df0733aa47b884207af25bd0c, type: 3}
-  m_Name: Tile2
+  m_Script: {fileID: 11500000, guid: 215085e80051f5d4b875f633ec962df0, type: 3}
+  m_Name: DecorationNoise1
   m_EditorClassIdentifier: 
-  tileID: 5
-  tileType: 1
-  tile: {fileID: 11400000, guid: 9849eac5db0883c46b4153a9820d3345, type: 2}
+  threshold: 0.485
+  frequenzy: 9.54
+  settings: {fileID: 11400000, guid: 1ac1da7e114f1ab46a41bd59f388e880, type: 2}
+  scale: 1

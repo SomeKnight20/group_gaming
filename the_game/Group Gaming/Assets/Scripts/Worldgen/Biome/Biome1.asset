@@ -31,3 +31,13 @@ MonoBehaviour:
   useLastTileIfEmptyBlend: 1
   tileAtlas: {fileID: 11400000, guid: e7ded2ce7c405da439dda4686f1dc4ba, type: 2}
   stone: {fileID: 11400000, guid: 85c30e7079a9a664cac4a7b1a49a62f1, type: 2}
+  groundDecorationList:
+  - tile: {fileID: 11400000, guid: 90b8d84460cd43d4db760afa1cdce4e5, type: 2}
+    spawnChanceWeight: 50
+  - tile: {fileID: 11400000, guid: c5ee2b09cc2c4ef4fbcdac1f73568434, type: 2}
+    spawnChanceWeight: 15
+  - tile: {fileID: 0}
+    spawnChanceWeight: 0
+  ceilingDecorationList: []
+  groundDecorationNoise: {fileID: 11400000, guid: 7e8486f2237637a4188b2d5e9a936f4d, type: 2}
+  ceilingDecorationNoise: {fileID: 0}
