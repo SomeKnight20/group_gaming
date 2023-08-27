@@ -636,7 +636,7 @@ public class Biome : ScriptableObject
             t.Start();
         }
 
-        foreach(Thread t in threads)
+        foreach (Thread t in threads)
         {
             t.Join();
         }
@@ -752,4 +752,19 @@ public class Biome : ScriptableObject
     }
 
     public Generator GetGenerator() { return generator; }
+
+    public void SetTileAt(int x, int y, TileAtlasTile tile)
+    {
+        this.SetTileAt(x, y, tile);
+    }
+
+    public void SetTileAt(Coord coord, TileAtlasTile tile)
+    {
+        this.tilemapData[coord] = tile;
+    }
+
+    public void GenerateStructures()
+    {
+
+    }
 }

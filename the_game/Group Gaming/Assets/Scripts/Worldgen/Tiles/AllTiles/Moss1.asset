@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4538775df0733aa47b884207af25bd0c, type: 3}
   m_Name: Moss1
   m_EditorClassIdentifier: 
-  tileID: 2
+  tileID: 1
   tileType: 1
   tile: {fileID: 11400000, guid: ad16b656dd7bffd4891ef3ded91a68eb, type: 2}

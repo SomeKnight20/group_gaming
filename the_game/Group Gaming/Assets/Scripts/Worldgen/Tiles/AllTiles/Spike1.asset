@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4538775df0733aa47b884207af25bd0c, type: 3}
   m_Name: Spike1
   m_EditorClassIdentifier: 
-  tileID: 7
+  tileID: 3
   tileType: 1
   tile: {fileID: 11400000, guid: 2c7208ff67167454f9c0b3533fb29ae8, type: 2}

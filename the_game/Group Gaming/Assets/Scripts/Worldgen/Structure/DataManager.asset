@@ -9,9 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4538775df0733aa47b884207af25bd0c, type: 3}
-  m_Name: EmptyTile
+  m_Script: {fileID: 11500000, guid: f43fc0707bbfd6241bf3b9a40425b4cd, type: 3}
+  m_Name: DataManager
   m_EditorClassIdentifier: 
-  tileID: 0
-  tileType: 1
-  tile: {fileID: 0}
+  tileAtlas: {fileID: 11400000, guid: e7ded2ce7c405da439dda4686f1dc4ba, type: 2}
+  pathToStructures:
+  - Scripts
+  - Worldgen
+  - Structure
+  - StructureData

@@ -458,18 +458,9 @@ MonoBehaviour:
   biomeNoisePixelSizeWidth: 70
   biomeNoisePixelSizeHeight: 25
   generateBiomesX: 3
-  generateBiomesY: 5
+  generateBiomesY: 3
   connectToClosestBiome: 1
   blendBiomes: 1
-  colors:
-  - {r: 1, g: 0.94731724, b: 0, a: 1}
-  - {r: 0, g: 0, b: 1, a: 1}
-  - {r: 0, g: 0.3207547, b: 0, a: 1}
-  - {r: 0.31083125, g: 0.5188679, b: 0.49137083, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 1, g: 0, b: 0.9031024, a: 1}
-  - {r: 0.49517727, g: 0, b: 1, a: 1}
 --- !u!1 &1660953772
 GameObject:
   m_ObjectHideFlags: 0
