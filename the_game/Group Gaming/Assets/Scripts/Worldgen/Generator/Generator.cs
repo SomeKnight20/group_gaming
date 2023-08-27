@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,11 +8,23 @@ public class Generator : ScriptableObject
     [Tooltip("What noise this generator uses to create pixels")]
     public Noise noise;
     public Dictionary<Coord, TileType> map = new Dictionary<Coord, TileType>(); // All tile positions for this specific generator, 1 = tile, 0 = air
+    protected GlobalSettings settings;
+
+    public virtual void OnStart()
+    {
+
+    }
 
     public virtual void ResetMap()
     {
         map = new Dictionary<Coord, TileType>(); // Resets all tiles in the map
     }
+
+    public void SetGlobalSettings(GlobalSettings globalSettings)
+    {
+        settings = globalSettings;
+    }
+
     public virtual void CreateMapFromArea(int startX, int startY, int width, int height)
     {
         // This function creates the map data for pixels, for example, 0 -> air, 1 -> solid
@@ -24,7 +35,7 @@ public class Generator : ScriptableObject
             for (int y = startY; y < startY + height; y++)
             {
                 int noiseValue = noise.GenerateNoiseAt(x, y); // Get the noise at x, y
-                map[new Coord(x,y)] = (TileType) noiseValue; // 0 or 1, 0: no tile, 1: tile
+                map[new Coord(x, y)] = (TileType)noiseValue; // 0 or 1, 0: no tile, 1: tile
             }
         }
     }
@@ -39,15 +50,15 @@ public class Generator : ScriptableObject
         int tileCount = 0;
         for (int x = tileX - 1; x <= tileX + 1; x++)
         {
-            for(int y = tileY - 1; y <= tileY + 1; y++)
+            for (int y = tileY - 1; y <= tileY + 1; y++)
             {
                 // If there is air or a solid tile at position
                 if (PositionIsGeneratedAt(x, y))
                 {
-                    // If current position in loop isn't 'the tile'
-                    if(x != tileX || y != tileY)
+                    // Skip current tile we are checking
+                    if (x != tileX || y != tileY)
                     {
-                        tileCount += (int) map[PositionToCoord(x, y)];
+                        tileCount += (int)map[PositionToCoord(x, y)];
                     }
                 }
                 else
@@ -59,7 +70,7 @@ public class Generator : ScriptableObject
         }
 
         return tileCount;
-    } 
+    }
     public virtual Coord PositionToCoord(int x, int y)
     {
         // Converts a position to coord-object
@@ -113,6 +124,16 @@ public class Generator : ScriptableObject
         {
             tileX = x;
             tileY = y;
+        }
+
+        public Vector2Int Vector2Int()
+        {
+            return new Vector2Int(tileX, tileY);
+        }
+
+        public Vector3Int Vector3Int(int z)
+        {
+            return new Vector3Int(tileX, tileY, z);
         }
 
         // Override Equals and GetHashCode methods for HashSet comparison

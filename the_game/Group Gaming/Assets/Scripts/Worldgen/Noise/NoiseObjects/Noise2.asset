@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215085e80051f5d4b875f633ec962df0, type: 3}
+  m_Name: Noise2
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 1ac1da7e114f1ab46a41bd59f388e880, type: 2}
+  frequenzy: 0.9
+  scale: 1.1
+  octaves: 1
+  lacunarity: 2
+  persistence: 0.5
+  threshold: 0.49069962

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9aa35fcbf27b894d932bfd7520c0eb8, type: 3}
+  m_Name: CNoise1
+  m_EditorClassIdentifier: 
+  threshold: 0.2
+  frequenzy: 12
+  settings: {fileID: 11400000, guid: 1ac1da7e114f1ab46a41bd59f388e880, type: 2}

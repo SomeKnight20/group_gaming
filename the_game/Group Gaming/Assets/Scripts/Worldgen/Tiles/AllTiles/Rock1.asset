@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4538775df0733aa47b884207af25bd0c, type: 3}
+  m_Name: Rock1
+  m_EditorClassIdentifier: 
+  tileID: 3
+  tileType: 1
+  tile: {fileID: 11400000, guid: 704a9c597d0b2fa47b2c3776ab27c441, type: 2}

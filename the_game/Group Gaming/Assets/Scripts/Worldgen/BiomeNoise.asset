@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215085e80051f5d4b875f633ec962df0, type: 3}
   m_Name: BiomeNoise
   m_EditorClassIdentifier: 
-  seed: 0
-  frequenzy: 2.5
-  scale: 1
-  threshold: 0.597
+  threshold: 0.379
+  settings: {fileID: 11400000, guid: 1ac1da7e114f1ab46a41bd59f388e880, type: 2}
+  frequenzy: 2.44
+  scale: 1.03
