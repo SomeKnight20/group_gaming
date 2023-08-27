@@ -35,7 +35,11 @@ public class ItemClass : ScriptableObject
 
     public virtual ItemClass GetItem() {return this;}
     public virtual ToolClass GetTool() {return null;}
+    public virtual ToolClass GetSecondary() {return null;}
     public virtual MiscClass GetMisc() {return null;}
     public virtual ConsumableClass GetConsumable() {return null;}
     public virtual ArmorClass GetArmor() {return null;}
+    public virtual ToolClass GetPants() {return null;}
+    public virtual ToolClass GetHelmet() {return null;}
+    public virtual ToolClass GetAccessory() {return null;}
 }

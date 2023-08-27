@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using Unity.VisualScripting;
 
 public class InventoryManager : MonoBehaviour
 {   
     [SerializeField] private GameObject itemCursor;
 
     [SerializeField] private GameObject slotHolder;
-    [SerializeField] private GameObject hotbarSlotHolder;
+    // [SerializeField] private GameObject hotbarSlotHolder;
     [SerializeField] private ItemClass itemToAdd;
     [SerializeField] private ItemClass itemToRemove;
     [SerializeField] private TMP_Text descriptionText;
@@ -19,7 +21,6 @@ public class InventoryManager : MonoBehaviour
     private SlotClass[] items;
 
     private GameObject[] slots;
-    private GameObject[] hotbarSlots;
 
     private SlotClass movingSlot;
     private SlotClass tempSlot;
@@ -37,17 +38,20 @@ public class InventoryManager : MonoBehaviour
     public GameObject ItemHolder;
     public GameObject PlayerCharacter;
 
+    public int equipmentSlotAmount = 8;
+    public int hotbarSlotAmount = 3;
+    private int totalLockedSlotAmount;
+
     bool isMovingItem;
 
+    [SerializeField] private GameObject hotbarSelector;
+    [SerializeField] private int selectedSlotIndex = 22;
+    public ItemClass selectedItem;
+
     private void Start(){
+        totalLockedSlotAmount = equipmentSlotAmount + hotbarSlotAmount;
         slots = new GameObject[slotHolder.transform.childCount];
         items = new SlotClass[slots.Length];
-
-        hotbarSlots = new GameObject[hotbarSlotHolder.transform.childCount];
-
-        for (int i = 0; i < hotbarSlots.Length; i++){
-            hotbarSlots[i] = hotbarSlotHolder.transform.GetChild(i).gameObject;
-        }
 
         //initialize slots
         for (int i = 0; i < items.Length; i++){
@@ -88,32 +92,35 @@ public class InventoryManager : MonoBehaviour
             // consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
             // armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
 
-            if(items[slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[slots.Length - hotbarSlots.Length].GetItem().GetTool() == null)
-                {
-                    // ItemClass tempAddedItem = items[slots.Length - hotbarSlots.Length].GetItem();
-                    // int tempAddedAmount = items[slots.Length - hotbarSlots.Length].GetQuantity();
-                    // items[slots.Length - hotbarSlots.Length].Clear();
-                    // Add(tempAddedItem, tempAddedAmount);
-
-                    CheckSlot(0);
-                } else primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
-            }
-
-            if(items[1 + slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[1 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "secondary")
+            #region Checkit
+            if(items[slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[slots.Length - equipmentSlotAmount].GetItem().GetSecondary() == null)
                 {
                     // ItemClass tempAddedItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
                     // int tempAddedAmount = items[1 + slots.Length - hotbarSlots.Length].GetQuantity();
                     // items[1 + slots.Length - hotbarSlots.Length].Clear();
                     // Add(tempAddedItem, tempAddedAmount);
 
-                    CheckSlot(1);
-                } else secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+                    CheckSlot(0);
+                } else secondaryItem = items[slots.Length - equipmentSlotAmount].GetItem();
             }
 
-            if(items[2 + slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[2 + slots.Length - hotbarSlots.Length].GetItem().GetConsumable() == null)
+            if(items[1 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[1 + slots.Length - equipmentSlotAmount].GetItem().GetTool() == null)
+                {
+                    // ItemClass tempAddedItem = items[slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(1);
+                } else primaryItem = items[1 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            
+
+            if(items[2 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[2 + slots.Length - equipmentSlotAmount].GetItem().GetHelmet() == null)
                 {
                     // ItemClass tempAddedItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
                     // int tempAddedAmount = items[2 + slots.Length - hotbarSlots.Length].GetQuantity();
@@ -121,11 +128,11 @@ public class InventoryManager : MonoBehaviour
                     // Add(tempAddedItem, tempAddedAmount);
 
                     CheckSlot(2);
-                } else consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+                } else consumableItem = items[2 + slots.Length - equipmentSlotAmount].GetItem();
             }
 
-            if(items[3 + slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[3 + slots.Length - hotbarSlots.Length].GetItem().GetArmor() == null)
+            if(items[3 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[3 + slots.Length - equipmentSlotAmount].GetItem().GetArmor() == null)
                 {
                     // ItemClass tempAddedItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
                     // int tempAddedAmount = items[3 + slots.Length - hotbarSlots.Length].GetQuantity();
@@ -133,11 +140,11 @@ public class InventoryManager : MonoBehaviour
                     // Add(tempAddedItem, tempAddedAmount);
 
                     CheckSlot(3);
-                } else armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+                } else armorItem = items[3 + slots.Length - equipmentSlotAmount].GetItem();
             }
 
-            if(items[4 + slots.Length - hotbarSlots.Length].GetItem() != null){
-                if (items[4 + slots.Length - hotbarSlots.Length].GetItem().itemSlotType != "accessory")
+            if(items[4 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[4 + slots.Length - equipmentSlotAmount].GetItem().GetPants() == null)
                 {
                     // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
                     // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
@@ -145,8 +152,45 @@ public class InventoryManager : MonoBehaviour
                     // Add(tempAddedItem, tempAddedAmount);
 
                     CheckSlot(4);
-                } else armorItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                } else armorItem = items[4 + slots.Length - equipmentSlotAmount].GetItem();
             }
+
+            if(items[5 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[5 + slots.Length - equipmentSlotAmount].GetItem().GetConsumable() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(5);
+                } else armorItem = items[5 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[6 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[6 + slots.Length - equipmentSlotAmount].GetItem().GetAccessory() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(6);
+                } else armorItem = items[6 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[7 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[7 + slots.Length - equipmentSlotAmount].GetItem().GetAccessory() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(7);
+                } else armorItem = items[7 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+            #endregion Inventory Utils
 
 
         } else if (Input.GetMouseButtonDown(1)){ //right clicked
@@ -158,7 +202,16 @@ public class InventoryManager : MonoBehaviour
             else {
                 BeginItemMove_Half();
             }
-        } 
+        }
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0) {
+            selectedSlotIndex = Mathf.Clamp(selectedSlotIndex + 1, 20, 23 -1);
+        } else if (Input.GetAxis("Mouse ScrollWheel") < 0) {
+            selectedSlotIndex = Mathf.Clamp(selectedSlotIndex - 1, 20, 23 -1);
+        }
+
+        hotbarSelector.transform.position = slots[selectedSlotIndex].transform.position;
+        selectedItem = items[selectedSlotIndex].GetItem();
 
         // Debug.Log(GetClosestSlot().GetItem().description);
 
@@ -211,28 +264,28 @@ public class InventoryManager : MonoBehaviour
             
         }
 
-        RefreshHotbar();
+        // RefreshHotbar();
     }
 
-    public void RefreshHotbar(){
-        for (int i = 0; i < hotbarSlots.Length; i++){
-            try {
-                //Jos on esine
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i + slots.Length - hotbarSlots.Length].GetItem().itemIcon;
+    // public void RefreshHotbar(){
+    //     for (int i = 0; i < hotbarSlots.Length; i++){
+    //         try {
+    //             //Jos on esine
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i + slots.Length - hotbarSlots.Length].GetItem().itemIcon;
                     
-                if (items[i + slots.Length - hotbarSlots.Length].GetItem().isStackable)
-                    hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = items[i + slots.Length - hotbarSlots.Length].GetQuantity() + "";
-                else
-                    hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
-            } catch {
-                //Jos ei esinettä
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
-                hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
-            }
-        }
-    }
+    //             if (items[i + slots.Length - hotbarSlots.Length].GetItem().isStackable)
+    //                 hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = items[i + slots.Length - hotbarSlots.Length].GetQuantity() + "";
+    //             else
+    //                 hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+    //         } catch {
+    //             //Jos ei esinettä
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
+    //             hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+    //         }
+    //     }
+    // }
 
     public bool Add(ItemClass item, int quantity){
         //items.Add(item);
@@ -242,7 +295,7 @@ public class InventoryManager : MonoBehaviour
             slot.AddQuantity(quantity);
         } 
         else{
-            for (int i = 0; i < items.Length - 5; i++){
+            for (int i = 0; i < items.Length - totalLockedSlotAmount; i++){
                 if (items[i].GetItem() == null) // this is an empty slot
                 {
                     items[i].AddItem(item, quantity);
@@ -288,7 +341,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     public void Consume(){
-        items[2 + slots.Length - hotbarSlots.Length].SubQuantity(1);
+        items[2 + slots.Length - equipmentSlotAmount].SubQuantity(1);
         RefreshUI();
     }
 
@@ -302,9 +355,9 @@ public class InventoryManager : MonoBehaviour
     }
 
     public void CheckSlot(int multiplier){
-        ItemClass tempAddedItem = items[multiplier + slots.Length - hotbarSlots.Length].GetItem();
-        int tempAddedAmount = items[multiplier + slots.Length - hotbarSlots.Length].GetQuantity();
-        items[multiplier + slots.Length - hotbarSlots.Length].Clear();
+        ItemClass tempAddedItem = items[multiplier + slots.Length - equipmentSlotAmount].GetItem();
+        int tempAddedAmount = items[multiplier + slots.Length - equipmentSlotAmount].GetQuantity();
+        items[multiplier + slots.Length - equipmentSlotAmount].Clear();
         Add(tempAddedItem, tempAddedAmount);
     }
 
@@ -415,7 +468,7 @@ public class InventoryManager : MonoBehaviour
 
     private SlotClass GetClosestSlot(){
         for (int i = 0; i < slots.Length; i++){
-            if (Vector2.Distance(slots[i].transform.position, Input.mousePosition) <= 32){
+            if (Vector2.Distance(slots[i].transform.position, Input.mousePosition) <= 46){
                 return items[i];
             }
         }

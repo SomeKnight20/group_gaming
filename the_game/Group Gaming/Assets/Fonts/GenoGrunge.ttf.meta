@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 8efabc4d6c4415346af7d17e69bfc804
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Geno Grunge
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: e11fd5901a98e0942b45b05198ac9909, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
