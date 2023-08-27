@@ -5,11 +5,18 @@ using UnityEngine;
 public class PlayerInventoryController : MonoBehaviour
 {
     public InventoryManager inventory;
+
+    public GameObject inventoryUI;
     
     public int addedArmorPoints;
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            inventoryUI.SetActive(!inventoryUI.activeSelf);
+        }
+
         if (Input.GetKeyDown(KeyCode.Q))
         {
             //use item

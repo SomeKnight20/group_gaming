@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Coal
   m_EditorClassIdentifier: 
   itemName: Coal
+  itemSlotType: misc
   itemIcon: {fileID: 0}
   isStackable: 1

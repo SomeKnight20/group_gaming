@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using Unity.VisualScripting;
 
 public class InventoryManager : MonoBehaviour
 {   
     [SerializeField] private GameObject itemCursor;
 
     [SerializeField] private GameObject slotHolder;
-    [SerializeField] private GameObject hotbarSlotHolder;
+    // [SerializeField] private GameObject hotbarSlotHolder;
     [SerializeField] private ItemClass itemToAdd;
     [SerializeField] private ItemClass itemToRemove;
+    [SerializeField] private TMP_Text descriptionText;
 
     [SerializeField] private SlotClass[] startingItems;
 
     private SlotClass[] items;
 
     private GameObject[] slots;
-    private GameObject[] hotbarSlots;
 
     private SlotClass movingSlot;
     private SlotClass tempSlot;
@@ -33,17 +35,23 @@ public class InventoryManager : MonoBehaviour
 
     public ItemHolderScript itemHolderScript;
 
+    public GameObject ItemHolder;
+    public GameObject PlayerCharacter;
+
+    public int equipmentSlotAmount = 8;
+    public int hotbarSlotAmount = 3;
+    private int totalLockedSlotAmount;
+
     bool isMovingItem;
 
+    [SerializeField] private GameObject hotbarSelector;
+    [SerializeField] private int selectedSlotIndex = 22;
+    public ItemClass selectedItem;
+
     private void Start(){
+        totalLockedSlotAmount = equipmentSlotAmount + hotbarSlotAmount;
         slots = new GameObject[slotHolder.transform.childCount];
         items = new SlotClass[slots.Length];
-
-        hotbarSlots = new GameObject[hotbarSlotHolder.transform.childCount];
-
-        for (int i = 0; i < hotbarSlots.Length; i++){
-            hotbarSlots[i] = hotbarSlotHolder.transform.GetChild(i).gameObject;
-        }
 
         //initialize slots
         for (int i = 0; i < items.Length; i++){
@@ -74,14 +82,116 @@ public class InventoryManager : MonoBehaviour
             //find the closest slot (the slot we clicked on)
             if (isMovingItem) {
                 EndItemMove();
+                
             }
                 //end item move
             else BeginItemMove();
 
-            primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
-            secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
-            consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
-            armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+            // primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
+            // secondaryItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+            // consumableItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+            // armorItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+
+            #region Checkit
+            if(items[slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[slots.Length - equipmentSlotAmount].GetItem().GetSecondary() == null)
+                {
+                    // ItemClass tempAddedItem = items[1 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[1 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[1 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(0);
+                } else secondaryItem = items[slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[1 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[1 + slots.Length - equipmentSlotAmount].GetItem().GetTool() == null)
+                {
+                    // ItemClass tempAddedItem = items[slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(1);
+                } else primaryItem = items[1 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            
+
+            if(items[2 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[2 + slots.Length - equipmentSlotAmount].GetItem().GetHelmet() == null)
+                {
+                    // ItemClass tempAddedItem = items[2 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[2 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[2 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(2);
+                } else consumableItem = items[2 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[3 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[3 + slots.Length - equipmentSlotAmount].GetItem().GetArmor() == null)
+                {
+                    // ItemClass tempAddedItem = items[3 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[3 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[3 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(3);
+                } else armorItem = items[3 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[4 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[4 + slots.Length - equipmentSlotAmount].GetItem().GetPants() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(4);
+                } else armorItem = items[4 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[5 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[5 + slots.Length - equipmentSlotAmount].GetItem().GetConsumable() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(5);
+                } else armorItem = items[5 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[6 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[6 + slots.Length - equipmentSlotAmount].GetItem().GetAccessory() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(6);
+                } else armorItem = items[6 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+
+            if(items[7 + slots.Length - equipmentSlotAmount].GetItem() != null){
+                if (items[7 + slots.Length - equipmentSlotAmount].GetItem().GetAccessory() == null)
+                {
+                    // ItemClass tempAddedItem = items[4 + slots.Length - hotbarSlots.Length].GetItem();
+                    // int tempAddedAmount = items[4 + slots.Length - hotbarSlots.Length].GetQuantity();
+                    // items[4 + slots.Length - hotbarSlots.Length].Clear();
+                    // Add(tempAddedItem, tempAddedAmount);
+
+                    CheckSlot(7);
+                } else armorItem = items[7 + slots.Length - equipmentSlotAmount].GetItem();
+            }
+            #endregion Inventory Utils
+
 
         } else if (Input.GetMouseButtonDown(1)){ //right clicked
             //find the closest slot (the slot we clicked on)
@@ -92,9 +202,39 @@ public class InventoryManager : MonoBehaviour
             else {
                 BeginItemMove_Half();
             }
-        } 
+        }
 
+        if (Input.GetAxis("Mouse ScrollWheel") > 0) {
+            selectedSlotIndex = Mathf.Clamp(selectedSlotIndex + 1, 20, 23 -1);
+        } else if (Input.GetAxis("Mouse ScrollWheel") < 0) {
+            selectedSlotIndex = Mathf.Clamp(selectedSlotIndex - 1, 20, 23 -1);
+        }
 
+        hotbarSelector.transform.position = slots[selectedSlotIndex].transform.position;
+        selectedItem = items[selectedSlotIndex].GetItem();
+
+        // Debug.Log(GetClosestSlot().GetItem().description);
+
+        // if(GetClosestSlot().GetItem() != null){
+        //     descriptionText.text = GetClosestSlot().GetItem().description;
+        // } else descriptionText.text = "";
+
+        if(isMovingItem == false){
+
+            try {
+            if(GetClosestSlot().GetItem() != null){
+            descriptionText.text = GetClosestSlot().GetItem().description;
+            } else descriptionText.text = "";
+            } catch {
+            descriptionText.text = "";
+            }
+
+        }
+        
+
+        // descriptionText.text = GetClosestSlot().GetItem().description;
+
+        // Debug.Log(items[2 + slots.Length - hotbarSlots.Length].GetItem().GetConsumable());
         // //VAIHA PRIMARY ITEMIKS JA JOKASELLE ITEMILLE OMA SLOTTI
         // //OPTIMOI JOS MAHOLLISTA
         // primaryItem = items[slots.Length - hotbarSlots.Length].GetItem();
@@ -124,28 +264,28 @@ public class InventoryManager : MonoBehaviour
             
         }
 
-        RefreshHotbar();
+        // RefreshHotbar();
     }
 
-    public void RefreshHotbar(){
-        for (int i = 0; i < hotbarSlots.Length; i++){
-            try {
-                //Jos on esine
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i + slots.Length - hotbarSlots.Length].GetItem().itemIcon;
+    // public void RefreshHotbar(){
+    //     for (int i = 0; i < hotbarSlots.Length; i++){
+    //         try {
+    //             //Jos on esine
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i + slots.Length - hotbarSlots.Length].GetItem().itemIcon;
                     
-                if (items[i + slots.Length - hotbarSlots.Length].GetItem().isStackable)
-                    hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = items[i + slots.Length - hotbarSlots.Length].GetQuantity() + "";
-                else
-                    hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
-            } catch {
-                //Jos ei esinettä
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
-                hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
-                hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
-            }
-        }
-    }
+    //             if (items[i + slots.Length - hotbarSlots.Length].GetItem().isStackable)
+    //                 hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = items[i + slots.Length - hotbarSlots.Length].GetQuantity() + "";
+    //             else
+    //                 hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+    //         } catch {
+    //             //Jos ei esinettä
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
+    //             hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
+    //             hotbarSlots[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+    //         }
+    //     }
+    // }
 
     public bool Add(ItemClass item, int quantity){
         //items.Add(item);
@@ -155,7 +295,7 @@ public class InventoryManager : MonoBehaviour
             slot.AddQuantity(quantity);
         } 
         else{
-            for (int i = 0; i < items.Length; i++){
+            for (int i = 0; i < items.Length - totalLockedSlotAmount; i++){
                 if (items[i].GetItem() == null) // this is an empty slot
                 {
                     items[i].AddItem(item, quantity);
@@ -201,7 +341,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     public void Consume(){
-        items[2 + slots.Length - hotbarSlots.Length].SubQuantity(1);
+        items[2 + slots.Length - equipmentSlotAmount].SubQuantity(1);
         RefreshUI();
     }
 
@@ -213,6 +353,14 @@ public class InventoryManager : MonoBehaviour
 
         return null;
     }
+
+    public void CheckSlot(int multiplier){
+        ItemClass tempAddedItem = items[multiplier + slots.Length - equipmentSlotAmount].GetItem();
+        int tempAddedAmount = items[multiplier + slots.Length - equipmentSlotAmount].GetQuantity();
+        items[multiplier + slots.Length - equipmentSlotAmount].Clear();
+        Add(tempAddedItem, tempAddedAmount);
+    }
+
     #endregion Inventory Utils
 
     #region Moving Stuff
@@ -222,7 +370,6 @@ public class InventoryManager : MonoBehaviour
         if (originalSlot == null || originalSlot.GetItem() == null){
             return false; //No item to move
         }
-
         movingSlot = new SlotClass(originalSlot);
         originalSlot.Clear();
         isMovingItem = true;
@@ -250,9 +397,15 @@ public class InventoryManager : MonoBehaviour
         originalSlot = GetClosestSlot();
 
         if (originalSlot == null) {
-            Add(movingSlot.GetItem(), movingSlot.GetQuantity());
-            movingSlot.Clear();
+            // Add(movingSlot.GetItem(), movingSlot.GetQuantity());
+            // movingSlot.Clear();
+            // Debug.Log("tyhja");
 
+            GameObject InstantiatedItemHolder = Instantiate(ItemHolder, PlayerCharacter.transform.position, PlayerCharacter.transform.rotation);
+			InstantiatedItemHolder.gameObject.GetComponent<ItemHolderScript>().itemiData = movingSlot.GetItem();
+            InstantiatedItemHolder.gameObject.GetComponent<ItemHolderScript>().itemiAmount = movingSlot.GetQuantity();
+            
+            movingSlot.Clear();
         }
         else {
 
@@ -269,6 +422,7 @@ public class InventoryManager : MonoBehaviour
                     tempSlot = new SlotClass(originalSlot);//a = b
                     originalSlot.AddItem(movingSlot.GetItem(), movingSlot.GetQuantity());//b = c
                     movingSlot.AddItem(tempSlot.GetItem(), tempSlot.GetQuantity());//a = c
+                    descriptionText.text = movingSlot.GetItem().description;
                     RefreshUI();
                     return true;
                 }
@@ -294,13 +448,13 @@ public class InventoryManager : MonoBehaviour
             return false;
         }
 
-        movingSlot.SubQuantity(1);
-
         if (originalSlot.GetItem() != null && originalSlot.GetItem() == movingSlot.GetItem()) {
             originalSlot.AddQuantity(1);
         } else {
             originalSlot.AddItem(movingSlot.GetItem(), 1);
         }
+
+        movingSlot.SubQuantity(1);
 
         if (movingSlot.GetQuantity() < 1){
             isMovingItem = false;
@@ -314,7 +468,7 @@ public class InventoryManager : MonoBehaviour
 
     private SlotClass GetClosestSlot(){
         for (int i = 0; i < slots.Length; i++){
-            if (Vector2.Distance(slots[i].transform.position, Input.mousePosition) <= 32){
+            if (Vector2.Distance(slots[i].transform.position, Input.mousePosition) <= 46){
                 return items[i];
             }
         }

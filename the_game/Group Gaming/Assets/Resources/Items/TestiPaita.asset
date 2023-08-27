@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TestiPaita
   m_EditorClassIdentifier: 
   itemName: TestiPaita
+  itemSlotType: armor
   itemIcon: {fileID: 0}
   isStackable: 1
   addedArmorPoints: 5

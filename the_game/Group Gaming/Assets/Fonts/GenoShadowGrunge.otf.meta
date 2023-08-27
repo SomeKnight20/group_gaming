@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: cb406ec4d9b484d48be48d8ad260a904
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Geno Shadow Grunge
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 201c4799ff6f3754e9cc74cfc36abdd6, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
