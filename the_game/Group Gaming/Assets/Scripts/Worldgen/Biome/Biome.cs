@@ -1,14 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.Tilemaps;
 using static Generator;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 [CreateAssetMenu(menuName = "Worldgen/Biome/Biome")]
 public class Biome : ScriptableObject
@@ -18,9 +14,20 @@ public class Biome : ScriptableObject
     protected Generator generator;
     protected WorldgenController worldGenerator; // Controls Worldgeneration
 
+    [Header("Generation")]
     [Tooltip("Chance to spawn this biome. 1 = default")]
     public float spawnWeight = 1;
+    [Tooltip("%-Chance that this biome copies the biome next to it instead of being itself")]
+    [Range(0f, 1f)]
+    public float copyChance = 0.5f;
+    [Range(0f, 1f)]
+    [Tooltip("Chance to do an expansion next to it")]
+    public float expansionChance = 0.5f;
+    [Range(0f, 1f)]
+    [Tooltip("Decreases the chance to further expand the biome")]
+    public float expansionChanceDecayAdditional = 0.1f;
 
+    [Header("Connections")]
     [Tooltip("How wide are the tunnels that connect two biomes together")]
     public int biomeConnectionRadiusMin = 3;
     [Tooltip("How wide are the tunnels that connect two biomes together")]
@@ -125,12 +132,22 @@ public class Biome : ScriptableObject
             return;
         }
 
-        foreach (KeyValuePair<Coord, TileAtlasTile> tile in this.tilemapData)
+        TileBase[] tilesToAdd = new TileBase[width * height];
+        Vector3Int[] tilePositions = new Vector3Int[width * height];
+
+        for (int i = 0; i < tilemapData.Count; i++)
         {
-            Coord coord = tile.Key;
-            TileAtlasTile tileData = tile.Value;
-            worldGenerator.SetTileAt(coord, tileData);
+            KeyValuePair<Coord, TileAtlasTile> tile = this.tilemapData.ElementAt(i);
+
+            //Coord coord = tile.Key;
+            //TileAtlasTile tileData = tile.Value;
+            //worldGenerator.SetTileAt(coord, tileData);
+
+            tilesToAdd[i] = tile.Value.tile;
+            tilePositions[i] = tile.Key.Vector3Int(0);
         }
+
+        worldGenerator.SetTiles(this.tilemapData, tilesToAdd, tilePositions);
 
         generator.ResetMap();
     }
@@ -311,46 +328,58 @@ public class Biome : ScriptableObject
         int countA = 0;
         int countB = 0;
 
-        // Loop through each biome tile
-        for (int yA = (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight - 1; yA > (biomeY) * worldGenerator.biomeNoisePixelSizeHeight; yA--)
+        Thread A = new Thread(delegate ()
         {
-            for (int xA = biomeX * worldGenerator.biomeNoisePixelSizeWidth; xA < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xA++)
+            // Loop through each biome tile
+            for (int yA = (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight - 1; yA > (biomeY) * worldGenerator.biomeNoisePixelSizeHeight; yA--)
             {
-                // If there is not air at a position
-                if (generator.TileExistsAt(xA, yA))
+                for (int xA = biomeX * worldGenerator.biomeNoisePixelSizeWidth; xA < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xA++)
                 {
-                    continue;
+                    // If there is not air at a position
+                    if (generator.TileExistsAt(xA, yA))
+                    {
+                        continue;
+                    }
+
+                    emptyTilesA.Add(new Coord(xA, yA));
                 }
 
-                emptyTilesA.Add(new Coord(xA, yA));
-            }
-
-            if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
-            {
-                break;
-            }
-            countA++;
-        }
-        // Find closest tile for this tile
-        for (int yB = (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB < (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yB++)
-        {
-            for (int xB = closestBiomeX * worldGenerator.biomeNoisePixelSizeWidth; xB < (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xB++)
-            {
-                // If there is not air at a position
-                if (worldGenerator.TileExistsAt(xB, yB))
+                if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
                 {
-                    continue;
+                    break;
                 }
-                emptyTilesB.Add(new Coord(xB, yB));
+                countA++;
             }
+        });
 
-            if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+        Thread B = new Thread(delegate ()
+        {
+            // Find closest tile for this tile
+            for (int yB = (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB < (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yB++)
             {
-                break;
-            }
-            countB++;
-        }
+                for (int xB = closestBiomeX * worldGenerator.biomeNoisePixelSizeWidth; xB < (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xB++)
+                {
+                    // If there is not air at a position
+                    if (worldGenerator.TileExistsAt(xB, yB))
+                    {
+                        continue;
+                    }
+                    emptyTilesB.Add(new Coord(xB, yB));
+                }
 
+                if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+                {
+                    break;
+                }
+                countB++;
+            }
+        });
+
+        // Wait for threads to finnish
+        A.Start();
+        B.Start();
+        A.Join();
+        B.Join();
 
         return FindClosestPoint(emptyTilesA, emptyTilesB);
     }
@@ -363,46 +392,57 @@ public class Biome : ScriptableObject
         int countA = 0;
         int countB = 0;
 
-        // find all empty tiles in both biomes' connection areas (Biome A)
-        for (int yA = biomeY * worldGenerator.biomeNoisePixelSizeHeight; yA < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yA++)
+        Thread A = new Thread(delegate ()
         {
-            for (int xA = biomeX * worldGenerator.biomeNoisePixelSizeWidth; xA < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xA++)
+            // find all empty tiles in both biomes' connection areas (Biome A)
+            for (int yA = biomeY * worldGenerator.biomeNoisePixelSizeHeight; yA < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yA++)
             {
-                // If there is not air at a position
-                if (generator.TileExistsAt(xA, yA))
+                for (int xA = biomeX * worldGenerator.biomeNoisePixelSizeWidth; xA < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xA++)
                 {
-                    continue;
+                    // If there is not air at a position
+                    if (generator.TileExistsAt(xA, yA))
+                    {
+                        continue;
+                    }
+
+                    emptyTilesA.Add(new Coord(xA, yA));
                 }
 
-                emptyTilesA.Add(new Coord(xA, yA));
-            }
-
-            if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
-            {
-                break;
-            }
-            countA++;
-        }
-
-        // find all empty tiles in both biomes' connection areas (Biome B)
-        for (int yB = (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight - 1; yB > (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB--)
-        {
-            for (int xB = closestBiomeX * worldGenerator.biomeNoisePixelSizeWidth; xB < (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xB++)
-            {
-                // If there is not air at a position
-                if (worldGenerator.TileExistsAt(xB, yB))
+                if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
                 {
-                    continue;
+                    break;
                 }
-                emptyTilesB.Add(new Coord(xB, yB));
+                countA++;
             }
-
-            if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+        });
+        Thread B = new Thread(delegate ()
+        {
+            // find all empty tiles in both biomes' connection areas (Biome B)
+            for (int yB = (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight - 1; yB > (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB--)
             {
-                break;
+                for (int xB = closestBiomeX * worldGenerator.biomeNoisePixelSizeWidth; xB < (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xB++)
+                {
+                    // If there is not air at a position
+                    if (worldGenerator.TileExistsAt(xB, yB))
+                    {
+                        continue;
+                    }
+                    emptyTilesB.Add(new Coord(xB, yB));
+                }
+
+                if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+                {
+                    break;
+                }
+                countB++;
             }
-            countB++;
-        }
+        });
+
+        // Wait for threads to finnish
+        A.Start();
+        B.Start();
+        A.Join();
+        B.Join();
 
         return FindClosestPoint(emptyTilesA, emptyTilesB);
     }
@@ -414,46 +454,57 @@ public class Biome : ScriptableObject
         int countA = 0;
         int countB = 0;
 
-        // Loop through each biome tile
-        for (int xA = (biomeX) * worldGenerator.biomeNoisePixelSizeWidth; xA < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xA++)
+        Thread A = new Thread(delegate ()
         {
-            for (int yA = biomeY * worldGenerator.biomeNoisePixelSizeHeight; yA < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yA++)
+            // Loop through each biome tile
+            for (int xA = (biomeX) * worldGenerator.biomeNoisePixelSizeWidth; xA < (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xA++)
             {
-                // If there is not air at a position
-                if (generator.TileExistsAt(xA, yA))
+                for (int yA = biomeY * worldGenerator.biomeNoisePixelSizeHeight; yA < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yA++)
                 {
-                    continue;
+                    // If there is not air at a position
+                    if (generator.TileExistsAt(xA, yA))
+                    {
+                        continue;
+                    }
+
+                    emptyTilesA.Add(new Coord(xA, yA));
                 }
 
-                emptyTilesA.Add(new Coord(xA, yA));
-            }
-
-            if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
-            {
-                break;
-            }
-            countA++;
-        }
-
-        // Find closest tile for this tile
-        for (int xB = (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth - 1; xB > (closestBiomeX) * worldGenerator.biomeNoisePixelSizeWidth; xB--)
-        {
-            for (int yB = (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB < (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yB++)
-            {
-                // If there is not air at a position
-                if (worldGenerator.TileExistsAt(xB, yB))
+                if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
                 {
-                    continue;
+                    break;
                 }
-                emptyTilesB.Add(new Coord(xB, yB));
+                countA++;
             }
-
-            if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+        });
+        Thread B = new Thread(delegate ()
+        {
+            // Find closest tile for this tile
+            for (int xB = (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth - 1; xB > (closestBiomeX) * worldGenerator.biomeNoisePixelSizeWidth; xB--)
             {
-                break;
+                for (int yB = (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB < (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yB++)
+                {
+                    // If there is not air at a position
+                    if (worldGenerator.TileExistsAt(xB, yB))
+                    {
+                        continue;
+                    }
+                    emptyTilesB.Add(new Coord(xB, yB));
+                }
+
+                if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+                {
+                    break;
+                }
+                countB++;
             }
-            countB++;
-        }
+        });
+
+        // Wait for threads to finnish
+        A.Start();
+        B.Start();
+        A.Join();
+        B.Join();
 
         return FindClosestPoint(emptyTilesA, emptyTilesB);
     }
@@ -466,45 +517,57 @@ public class Biome : ScriptableObject
         int countA = 0;
         int countB = 0;
 
-        // Loop through each biome tile
-        for (int xA = (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth - 1; xA > (biomeX) * worldGenerator.biomeNoisePixelSizeWidth; xA--)
+        Thread A = new Thread(delegate ()
         {
-            for (int yA = biomeY * worldGenerator.biomeNoisePixelSizeHeight; yA < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yA++)
+            // Loop through each biome tile
+            for (int xA = (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth - 1; xA > (biomeX) * worldGenerator.biomeNoisePixelSizeWidth; xA--)
             {
-                // If there is not air at a position
-                if (generator.TileExistsAt(xA, yA))
+                for (int yA = biomeY * worldGenerator.biomeNoisePixelSizeHeight; yA < (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yA++)
                 {
-                    continue;
+                    // If there is not air at a position
+                    if (generator.TileExistsAt(xA, yA))
+                    {
+                        continue;
+                    }
+
+                    emptyTilesA.Add(new Coord(xA, yA));
                 }
 
-                emptyTilesA.Add(new Coord(xA, yA));
-            }
-
-            if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
-            {
-                break;
-            }
-            countA++;
-        }
-        // Find closest tile for this tile
-        for (int xB = (closestBiomeX) * worldGenerator.biomeNoisePixelSizeWidth; xB < (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xB++)
-        {
-            for (int yB = (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB < (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yB++)
-            {
-                // If there is not air at a position
-                if (worldGenerator.TileExistsAt(xB, yB))
+                if (countA > biomeConnectionScanSize && emptyTilesA.Count > 0)
                 {
-                    continue;
+                    break;
                 }
-                emptyTilesB.Add(new Coord(xB, yB));
+                countA++;
             }
-
-            if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+        });
+        Thread B = new Thread(delegate ()
+        {
+            // Find closest tile for this tile
+            for (int xB = (closestBiomeX) * worldGenerator.biomeNoisePixelSizeWidth; xB < (closestBiomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth; xB++)
             {
-                break;
+                for (int yB = (closestBiomeY) * worldGenerator.biomeNoisePixelSizeHeight; yB < (closestBiomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight; yB++)
+                {
+                    // If there is not air at a position
+                    if (worldGenerator.TileExistsAt(xB, yB))
+                    {
+                        continue;
+                    }
+                    emptyTilesB.Add(new Coord(xB, yB));
+                }
+
+                if (countB > biomeConnectionScanSize && emptyTilesB.Count > 0)
+                {
+                    break;
+                }
+                countB++;
             }
-            countB++;
-        }
+        });
+
+        // Wait for threads to finnish
+        A.Start();
+        B.Start();
+        A.Join();
+        B.Join();
 
 
         return FindClosestPoint(emptyTilesA, emptyTilesB);
@@ -550,16 +613,28 @@ public class Biome : ScriptableObject
 
         List<Coord> line = GetLine(bestTileA, bestTileB);
         System.Random rand = new System.Random(settings.globalSeed);
+
+        List<Thread> threads = new List<Thread>();
+
         foreach (Coord c in line)
         {
-            int biomeConnectionRadius = rand.Next(biomeConnectionRadiusMin, biomeConnectionRadiusMax);
-            List<Coord> circleCoords = DrawCircle(c, biomeConnectionRadius);
-
-            // Add coords to biomepassage list to process them later
-            foreach (Coord coord in circleCoords)
+            Thread t = new Thread(delegate ()
             {
-                biomePassageCoords.Add(coord);
-            }
+                int biomeConnectionRadius = rand.Next(biomeConnectionRadiusMin, biomeConnectionRadiusMax);
+                List<Coord> circleCoords = DrawCircle(c, biomeConnectionRadius);
+
+                // Add coords to biomepassage list to process them later
+                foreach (Coord coord in circleCoords)
+                {
+                    biomePassageCoords.Add(coord);
+                }
+            });
+            t.Start();
+        }
+
+        foreach(Thread t in threads)
+        {
+            t.Join();
         }
     }
 

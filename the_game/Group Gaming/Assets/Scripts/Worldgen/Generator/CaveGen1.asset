@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ef3c7b4702a6340b6a65d249903e09, type: 3}
   m_Name: CaveGen1
   m_EditorClassIdentifier: 
-  noise: {fileID: 11400000, guid: 65346a9cc68d32247b6e37e554d327d7, type: 2}
-  smoothingIterationCount: 1
-  postSmoothingIterationCount: 3
+  noise: {fileID: 11400000, guid: ef122142aaae81f4aa8f3fcf00074dae, type: 2}
+  smoothingIterationCount: 0
+  postSmoothingIterationCount: 1
   adjancedTileCountOffset: 0
-  minCaveRoomSize: 50
+  minCaveRoomSize: 0
   caveRoomConnectionIterations: 1
-  caveRoomConnectionRadius: 2
+  caveRoomConnectionRadiusMin: 2
+  caveRoomConnectionRadiusMax: 4
   maxConnectionDistance: 9999999

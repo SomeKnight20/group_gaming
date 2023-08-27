@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -125,6 +124,16 @@ public class Generator : ScriptableObject
         {
             tileX = x;
             tileY = y;
+        }
+
+        public Vector2Int Vector2Int()
+        {
+            return new Vector2Int(tileX, tileY);
+        }
+
+        public Vector3Int Vector3Int(int z)
+        {
+            return new Vector3Int(tileX, tileY, z);
         }
 
         // Override Equals and GetHashCode methods for HashSet comparison
