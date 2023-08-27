@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEditor.U2D.Aseprite;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 [CreateAssetMenu(menuName = "Worldgen/Generator/CaveGenerator1")]
 public class CaveGenerator1 : Generator

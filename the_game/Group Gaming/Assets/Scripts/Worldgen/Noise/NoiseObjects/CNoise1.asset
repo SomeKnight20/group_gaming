@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 215085e80051f5d4b875f633ec962df0, type: 3}
-  m_Name: BiomeNoise
+  m_Script: {fileID: 11500000, guid: d9aa35fcbf27b894d932bfd7520c0eb8, type: 3}
+  m_Name: CNoise1
   m_EditorClassIdentifier: 
-  threshold: 0.379
+  threshold: 0.2
+  frequenzy: 12
   settings: {fileID: 11400000, guid: 1ac1da7e114f1ab46a41bd59f388e880, type: 2}
-  frequenzy: 2.44
-  scale: 1.03
