@@ -14,28 +14,27 @@ public class WorldgenController : MonoBehaviour
     public List<Biome> biomes = new List<Biome>();
 
     [Header("Biome Generation Chances")]
-    [Tooltip("Chance to copy a surrounding biome")]
+    [Tooltip("If biome is trying to copy a surrounding biome, this chance is tested")]
     public float copyChanceOfABiome = 0.5f;
-    [Tooltip("How big 1 pixel is on the biome noise map")]
-    public int biomeNoisePixelSizeWidth = 50;
-    [Tooltip("How big 1 pixel is on the biome noise map")]
-    public int biomeNoisePixelSizeHeight = 50;
 
-    Dictionary<Biome, float> biomeSpawnChances = new Dictionary<Biome, float>();
-    Dictionary<Coord, Biome> biomeMap = new Dictionary<Coord, Biome>();
-    HashSet<Coord> generatedBiomes = new HashSet<Coord>();
+    Dictionary<Biome, float> biomeSpawnChances;
+    Dictionary<Coord, Biome> biomeMap;
+    HashSet<Coord> generatedBiomes;
     float allBiomesWeight = 0; // All biome weights added together
     System.Random biomeNoiseRandomizer;
     System.Random biomeNoiseCopyRandomizer;
     System.Random biomeNoiseExpansionRandomizer;
 
     // Tilemap stuff
-    protected Dictionary<Coord, TileAtlasTile> allTilemapData = new Dictionary<Coord, TileAtlasTile>(); // Contains all generated tiles
+    protected Dictionary<Coord, TileAtlasTile> allTilemapData; // Contains all generated tiles
     [Header("Tilemap")]
     public Tilemap tilemap;
 
     [Header("Biome Generation")]
-    public Noise biomeNoise;
+    [Tooltip("How big 1 pixel is on the biome noise map")]
+    public int biomeNoisePixelSizeWidth = 50;
+    [Tooltip("How big 1 pixel is on the biome noise map")]
+    public int biomeNoisePixelSizeHeight = 50;
     public int generateBiomesX = 4;
     public int generateBiomesY = 4;
 
@@ -43,20 +42,15 @@ public class WorldgenController : MonoBehaviour
     public bool connectToClosestBiome = true;
     public bool blendBiomes = true;
 
-    // Debugging
-    [Header("Debugging")]
-    public List<Color> colors = new List<Color>();
-    public Dictionary<Coord, float> noises = new Dictionary<Coord, float>();
-
     // private Dictionary<Vector2, float> testNoiseMap = new Dictionary<Vector2, float>();
 
     private void Start()
     {
         ResetRandomizers();
-        ResetRandomizers();
-        ResetRandomizers();
-        ResetRandomizers();
-        ResetRandomizers();
+
+        biomeMap = new Dictionary<Coord, Biome>();
+        generatedBiomes = new HashSet<Coord>();
+        allTilemapData = new Dictionary<Coord, TileAtlasTile>();
 
         foreach (Biome biome in biomes)
         {
@@ -66,13 +60,15 @@ public class WorldgenController : MonoBehaviour
             biome.OnStart();
         }
 
-        RecalculateBiomeChances();
+        CalculateBiomeChances();
         GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSizeWidth, generateBiomesY * biomeNoisePixelSizeHeight);
         GenerateWorld(0, 0, generateBiomesX, generateBiomesY);
     }
 
-    void RecalculateBiomeChances()
+    void CalculateBiomeChances()
     {
+        biomeSpawnChances = new Dictionary<Biome, float>();
+
         // Add biome weights together
         allBiomesWeight = 0;
         foreach (Biome biome in biomes)
@@ -121,8 +117,6 @@ public class WorldgenController : MonoBehaviour
     }
     void GenerateBiomeMapAreaAt(int startX, int startY, int width, int height)
     {
-        // Generates a biome map for a certain area
-        noises.Clear();
         // Loop through each coordinate
 
         for (int x = startX; x < width + startX; x++)
@@ -137,7 +131,6 @@ public class WorldgenController : MonoBehaviour
     void CalculateBiomeMapAt(int x, int y)
     {
         float noiseValue = BiomeNoiseAt(x, y);
-        noises.Add(new Coord(x, y), noiseValue);
 
         foreach (KeyValuePair<Biome, float> kvp in biomeSpawnChances)
         {
@@ -343,11 +336,20 @@ public class WorldgenController : MonoBehaviour
         {
             ResetMap();
             ResetRandomizers();
+
+            biomeMap = new Dictionary<Coord, Biome>();
+            generatedBiomes = new HashSet<Coord>();
+            allTilemapData = new Dictionary<Coord, TileAtlasTile>();
+
             foreach (Biome biome in biomes)
             {
-                biome.ResetMap();
+                biome.SetDefaultTilemap(tilemap);
+                biome.SetWorldGenerator(this);
+                biome.SetGlobalSettings(settings);
+                biome.OnStart();
             }
-            RecalculateBiomeChances();
+
+            CalculateBiomeChances();
             GenerateBiomeMapAreaAt(0, 0, generateBiomesX * biomeNoisePixelSizeWidth, generateBiomesY * biomeNoisePixelSizeHeight);
             GenerateWorld(0, 0, generateBiomesX, generateBiomesY);
         }

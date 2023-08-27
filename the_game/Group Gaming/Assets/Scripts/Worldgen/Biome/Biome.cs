@@ -64,16 +64,20 @@ public class Biome : ScriptableObject
     protected GlobalSettings settings;
 
     // Connected to biomes
-    public HashSet<Biome> connectedBiomes = new HashSet<Biome>();
+    public HashSet<Biome> connectedBiomes;
 
-    protected Dictionary<Coord, TileAtlasTile> tilemapData = new Dictionary<Coord, TileAtlasTile>();
+    protected Dictionary<Coord, TileAtlasTile> tilemapData;
 
     // Biome passages
-    protected List<Coord> biomePassageCoords = new List<Coord>();
+    protected List<Coord> biomePassageCoords;
 
     public virtual void OnStart()
     {
         generator.OnStart();
+
+        connectedBiomes = new HashSet<Biome>();
+        biomePassageCoords = new List<Coord>();
+        tilemapData = new Dictionary<Coord, TileAtlasTile>();
     }
 
     public void SetGlobalSettings(GlobalSettings globalSettings)
@@ -666,12 +670,12 @@ public class Biome : ScriptableObject
         biomePassageCoords.Clear();
     }
 
-    bool IsInBiomeBounds(int biomeX, int biomeY, int x, int y)
+    protected bool IsInBiomeBounds(int biomeX, int biomeY, int x, int y)
     {
         return ((x >= biomeX * worldGenerator.biomeNoisePixelSizeWidth && x <= (biomeX + 1) * worldGenerator.biomeNoisePixelSizeWidth) && (y >= biomeY * worldGenerator.biomeNoisePixelSizeHeight && y <= (biomeY + 1) * worldGenerator.biomeNoisePixelSizeHeight));
     }
 
-    List<Coord> GetLine(Coord from, Coord to)
+    protected List<Coord> GetLine(Coord from, Coord to)
     {
         // Big math dont touch
         List<Coord> line = new List<Coord>();
@@ -736,7 +740,7 @@ public class Biome : ScriptableObject
         return this.connectedBiomes.Contains(biome);
     }
 
-    void SetConnectedBiome(Biome biome)
+    protected void SetConnectedBiome(Biome biome)
     {
         if (this.IsConnectedToBiome(biome))
         {
